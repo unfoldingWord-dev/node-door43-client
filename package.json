@@ -1,0 +1,22 @@
+{
+  "name": "door43-client",
+  "version": "0.1.0",
+  "description": "A client library for interacting with the door43 resource catalog api.",
+  "main": "./lib/door43-client.js",
+  "scripts": {
+    "test": "gulp test"
+  },
+  "author": "Joel Lonbeck <joel@neutrinographics.com> (http://neutrinographics.com)",
+  "license": "MIT",
+  "devDependencies": {
+    "gulp": "^3.9.1",
+    "gulp-mocha": "^2.2.0",
+    "lodash": "^4.6.1",
+    "mocha": "^2.4.5",
+    "rimraf": "^2.5.3"
+  },
+  "dependencies": {
+    "mkdirp": "^0.5.1",
+    "sql.js": "^0.2.21"
+  }
+}
