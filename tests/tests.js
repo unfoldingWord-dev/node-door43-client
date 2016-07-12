@@ -97,9 +97,10 @@
             this.timeout(1000000);
 
             before((done) => {
-                rimraf.sync('./out');
+                var altLibraryPath = './out/alt-library.sqlite';
+                rimraf.sync(altLibraryPath);
                 // TRICKY: we have to re-initialize to load the latest schema
-                client = new Door43Client(indexPath, resourceDir);
+                client = new Door43Client(altLibraryPath, resourceDir);
                 done();
             });
 
@@ -188,9 +189,9 @@
             this.timeout(1000000);
 
             before((done) => {
-                rimraf.sync('./build');
+                rimraf.sync('./out');
                 // TRICKY: we have to re-initialize to load the latest schema
-                client = new Door43Client('./build/library.sqlite', './build/res');
+                client = new Door43Client(indexPath, resourceDir);
                 done();
             });
 
