@@ -104,7 +104,7 @@
             });
 
             it('downloads the resource catalog from the api and indexes it', (done) => {
-                client.downloadCatalogTest(catalogUrl, 'obs').then(() => {
+                client.downloadCatalogTest(catalogUrl, 'gen').then(() => {
                     return client.index.getSourceLanguages();
                 }).then((languages) => {
                     assert(languages.length > 0);
@@ -147,7 +147,7 @@
                             countdata[res.language_slug][res.project_slug][res.slug] = {};
                         }
                     }
-                    return client.downloadCatalogTest(catalogUrl, 'obs');
+                    return client.downloadCatalogTest(catalogUrl, 'gen');
                 }).then(() => {
                     // begin comparing counts
                     return client.index.getSourceLanguages();
