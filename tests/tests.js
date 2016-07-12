@@ -1,6 +1,7 @@
 ;(function() {
     var assert = require('assert'),
         Door43Client = require('../'),
+        utils = require('../lib/utils'),
         rimraf = require('rimraf');
 
     const catalogUrl = 'https://api.unfoldingword.org/ts/txt/2/catalog.json'
@@ -41,12 +42,14 @@
                 it('returns a list of projects in a source language', (done) => {
                     client.index.getProjects('en').then(function(result)  {
                         assert(result.length > 0);
+                        assert(result[0].language_slug === 'en');
                     }).then(done, done);
                 });
 
                 it('returns a single project', (done) => {
                     client.index.getProject('en', 'obs').then(function(result) {
                         assert(result.slug === 'obs');
+                        assert(result.language_slug === 'en');
                     }).then(done, done);
                 });
 
@@ -68,6 +71,8 @@
                     client.index.getResources('en', 'obs').then(function(result)  {
                         assert(result.length > 0);
                         assert(result[0].container_format !== null);
+                        assert(result[0].language_slug === 'en');
+                        assert(result[0].project_slug === 'obs');
                     }).then(done, done);
                 });
 
@@ -75,6 +80,8 @@
                     client.index.getResource('en', 'obs', 'obs').then(function(result) {
                         assert(result.slug === 'obs');
                         assert(result.container_format !== null);
+                        assert(result.language_slug === 'en');
+                        assert(result.project_slug === 'obs');
                     }).then(done, done);
                 });
 
@@ -85,8 +92,8 @@
                 });
             });
         });
-        
-        describe('@Library Generation', function() {
+
+        describe('@Library Generation Test', function() {
             this.timeout(1000000);
 
             before((done) => {
@@ -97,27 +104,99 @@
             });
 
             it('downloads the resource catalog from the api and indexes it', (done) => {
-                client.downloadCatalog(catalogUrl).then(() => {
-                    assert(client.index.getSourceLanguages().length > 0);
+                client.downloadCatalogTest(catalogUrl, 'obs').then(() => {
+                    return client.index.getSourceLanguages();
+                }).then((languages) => {
+                    assert(languages.length > 0);
                 }).then(done, done);
             });
 
             it('downloads the resource catalog from the api and updates the existing indexes without creating duplicates', (done) => {
-                var data = client.index.getSourceLanguages();
-                for(var lang of data) {
-                    lang.projects = client.index.getProjects(lang.slug);
-                    for(var proj of lang.projects) {
-                        proj.resources = client.index.getResources(lang.slug, proj.slug);
+                const utilGetResources = function(data) {
+                    return client.index.getResources(data.languageSlug, data.projectSlug);
+                };
+                var countdata = {};
+                client.index.getSourceLanguages().then((languages) => {
+                    var list = [];
+                    for(var lang of languages) {
+                        countdata[lang.slug] = {};
+                        list.push(lang.slug);
                     }
-                }
-                client.downloadCatalog(catalogUrl).then(() => {
-                    assert(client.index.getSourceLanguages().length === data.length);
-                    for(var lang of data) {
-                        assert(client.index.getProjects(lang.slug).length === lang.projects.length);
-                        for(var proj of lang.projects) {
-                            assert(client.index.getResources(lang.slug, proj.slug).length === proj.resources.lenght);
+                    return utils.chain(client.index.getProjects, function(err, data) {
+                        console.error(err.message);
+                        return false;
+                    })(list);
+                }).then((projects) => {
+                    var list = [];
+                    for(var proj of projects) {
+                        for(var localizedProj of proj) {
+                            countdata[localizedProj.language_slug][localizedProj.slug] = {};
+                            list.push({
+                                languageSlug:localizedProj.language_slug,
+                                projectSlug:localizedProj.slug
+                            });
                         }
                     }
+                    return utils.chain(utilGetResources, function(err, data) {
+                        console.error(err.message);
+                        return false;
+                    })(list);
+                }).then((resources) => {
+                    for(var proj of resources) {
+                        for(var res of proj) {
+                            countdata[res.language_slug][res.project_slug][res.slug] = {};
+                        }
+                    }
+                    return client.downloadCatalogTest(catalogUrl, 'obs');
+                }).then(() => {
+                    // begin comparing counts
+                    return client.index.getSourceLanguages();
+                }).then((languages) => {
+                    assert(languages.length === Object.keys(countdata).length);
+                    list = [];
+                    for(var lang of languages) {
+                        list.push(lang.slug);
+                    }
+                    return utils.chain(client.index.getProjects, function(err, data) {
+                        console.error(err.message);
+                        return false;
+                    })(list);
+                }).then((projects) => {
+                    var list = [];
+                    for(var proj of projects) {
+                        assert(proj.length === Object.keys(countdata[proj[0].language_slug]).length);
+                        for(var localizedProj of proj) {
+                            list.push({
+                                languageSlug:localizedProj.language_slug,
+                                projectSlug:localizedProj.slug
+                            });
+                        }
+                    }
+                    return utils.chain(utilGetResources, function(err, data) {
+                        console.error(err.message);
+                        return false;
+                    })(list);
+                }).then((resources) => {
+                    for(var proj of resources) {
+                        assert(proj.length === Object.keys(countdata[proj[0].language_slug][proj[0].project_slug]).length);
+                    }
+                }).then(done, done);
+            });
+        });
+
+        describe('@Generate Library', function() {
+            this.timeout(1000000);
+
+            before((done) => {
+                rimraf.sync('./build');
+                // TRICKY: we have to re-initialize to load the latest schema
+                client = new Door43Client('./build/library.sqlite', './build/res');
+                done();
+            });
+
+            it('downloads the resource catalog from the api and indexes it', (done) => {
+                client.downloadCatalog(catalogUrl).then(() => {
+                    assert(client.index.getSourceLanguages().length > 0);
                 }).then(done, done);
             });
         });
