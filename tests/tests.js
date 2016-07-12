@@ -80,7 +80,7 @@
             });
         });
         
-        describe('@Server Calls', function() {
+        describe('@Library Generation', function() {
             this.timeout(1000000);
 
             before((done) => {
@@ -93,10 +93,12 @@
                     assert(client.index.getSourceLanguages().length > 0);
                 }).then(done, done);
             });
-
+        });
+        
+        describe('@Server Calls', function() {
             it('downloads a resource container from the api and stores it', (done) => {
-                client.downloadResource('en-gen-ulb').then((result) => {
-                    // todo check if it worked
+                client.downloadResourceContainer('en', 'gen', 'ulb').then((result) => {
+                    assert(result === true);
                 }).then(done, done);
             });
         });

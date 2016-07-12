@@ -114,6 +114,25 @@ CREATE TABLE `resource` (
   FOREIGN KEY (project_id) REFERENCES `project` (`id`)
 );
 
+
+-- ---
+-- Table 'resource_format'
+--
+-- ---
+
+DROP TABLE IF EXISTS `resource_format`;
+
+CREATE TABLE `resource_format` (
+  `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `syntax_version` TEXT NOT NULL,
+  `mime_type` TEXT NOT NULL,
+  `modified_at` INTEGER NOT NULL DEFAULT 0,
+  `url` TEXT NOT NULL,
+  `resource_id` INTEGER NOT NULL,
+  UNIQUE (`mime_type`, `resource_id`),
+  FOREIGN KEY (resource_id) REFERENCES `resource` (`id`)
+);
+
 -- ---
 -- Table 'questionnaire_question'
 --
@@ -228,6 +247,8 @@ CREATE INDEX `source_language_slug` ON `source_language`(`slug`);
 CREATE INDEX `resource_slug` ON `resource`(`slug`);
 CREATE INDEX `resource_translate_mode` ON `resource`(`translate_mode`);
 CREATE INDEX `resource_checking_level` ON `resource`(`checking_level`);
+
+CREATE INDEX `resource_format_mime_type` ON `resource_format`(`mime_type`);
 
 CREATE INDEX `target_language_slug` ON `target_language`(`slug`);
 CREATE INDEX `target_language_name` ON `target_language`(`name`);
