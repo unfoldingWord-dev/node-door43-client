@@ -107,7 +107,7 @@ CREATE TABLE `resource` (
   `checking_level` TEXT NOT NULL,
   `comments` TEXT NULL DEFAULT NULL,
   `pub_date` DATE NULL DEFAULT NULL,
-  `license` TEXT NOT NULL,
+  `license` TEXT NULL DEFAULT NULL,
   `version` TEXT NOT NULL,
   `project_id` INTEGER NOT NULL,
   UNIQUE (`project_id`, `slug`),
