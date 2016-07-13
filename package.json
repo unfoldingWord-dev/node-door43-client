@@ -1,13 +1,21 @@
 {
   "name": "door43-client",
   "version": "0.1.0",
-  "description": "A client library for interacting with the door43 resource catalog api.",
+  "description": "A client library for interacting with the Door43 Catalog.",
   "main": "./lib/door43-client.js",
   "scripts": {
     "test": "gulp test"
   },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/unfoldingWord-dev/node-door43-client.git"
+  },
+  "bugs": {
+    "url": "https://github.com/unfoldingWord-dev/node-door43-client/issues"
+  },
   "author": "Joel Lonbeck <joel@neutrinographics.com> (http://neutrinographics.com)",
   "license": "MIT",
+  "homepage": "https://github.com/unfoldingWord-dev/node-door43-client#readme",
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-mocha": "^2.2.0",
