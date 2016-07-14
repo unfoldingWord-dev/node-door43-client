@@ -38,20 +38,6 @@ CREATE TABLE `category_name` (
 );
 
 -- ---
--- Table 'questionnaire'
---
--- ---
-
-DROP TABLE IF EXISTS `questionnaire`;
-
-CREATE TABLE `questionnaire` (
-  `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  `language_slug` TEXT NOT NULL,
-  `language_name` TEXT NOT NULL,
-  `language_direction` TEXT NOT NULL DEFAULT ltr
-);
-
--- ---
 -- Table 'category'
 --
 -- ---
@@ -63,22 +49,6 @@ CREATE TABLE `category` (
   `slug` TEXT NOT NULL,
   `parent_id` INTEGER NOT NULL DEFAULT 0,
   UNIQUE(`slug`, `parent_id`)
-);
-
--- ---
--- Table 'chunk_marker'
---
--- ---
-
-DROP TABLE IF EXISTS `chunk_marker`;
-
-CREATE TABLE `chunk_marker` (
-  `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  `chapter` TEXT NOT NULL,
-  `verse` TEXT NOT NULL,
-  `versification_id` INTEGER NOT NULL,
-  UNIQUE (`versification_id`, `chapter`, `verse`),
-  FOREIGN KEY (versification_id) REFERENCES `versification` (`id`) ON DELETE CASCADE
 );
 
 -- ---
@@ -135,6 +105,20 @@ CREATE TABLE `resource_format` (
   `resource_id` INTEGER NOT NULL,
   UNIQUE (`mime_type`, `resource_id`),
   FOREIGN KEY (resource_id) REFERENCES `resource` (`id`) ON DELETE CASCADE
+);
+
+-- ---
+-- Table 'questionnaire'
+--
+-- ---
+
+DROP TABLE IF EXISTS `questionnaire`;
+
+CREATE TABLE `questionnaire` (
+  `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `language_slug` TEXT NOT NULL,
+  `language_name` TEXT NOT NULL,
+  `language_direction` TEXT NOT NULL DEFAULT ltr
 );
 
 -- ---
@@ -204,6 +188,23 @@ CREATE TABLE `temp_target_language` (
 );
 
 -- ---
+-- Table 'versification_name'
+--
+-- ---
+
+DROP TABLE IF EXISTS `versification_name`;
+
+CREATE TABLE `versification_name` (
+  `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `source_language_id` INTEGER NOT NULL,
+  `versification_id` INTEGER NOT NULL,
+  `name` TEXT NOT NULL,
+  FOREIGN KEY (source_language_id) REFERENCES `source_language` (`id`),
+  FOREIGN KEY (versification_id) REFERENCES `versification` (`id`) ON DELETE CASCADE,
+  UNIQUE(`source_language_id`, `versification_id`, `name`)
+);
+
+-- ---
 -- Table 'versification'
 --
 -- ---
@@ -213,9 +214,23 @@ DROP TABLE IF EXISTS `versification`;
 CREATE TABLE `versification` (
   `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   `slug` TEXT NOT NULL,
-  `name` TEXT NOT NULL,
-  `project_id` INTEGER NOT NULL,
-  FOREIGN KEY (project_id) REFERENCES `project` (`id`) ON DELETE CASCADE
+  UNIQUE(`slug`)
+);
+
+-- ---
+-- Table 'chunk_marker'
+--
+-- ---
+
+DROP TABLE IF EXISTS `chunk_marker`;
+
+CREATE TABLE `chunk_marker` (
+  `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `chapter` TEXT NOT NULL,
+  `verse` TEXT NOT NULL,
+  `versification_id` INTEGER NOT NULL,
+  UNIQUE (`versification_id`, `chapter`, `verse`),
+  FOREIGN KEY (versification_id) REFERENCES `versification` (`id`) ON DELETE CASCADE
 );
 
 -- ---
