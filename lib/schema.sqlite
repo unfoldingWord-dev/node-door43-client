@@ -167,8 +167,11 @@ CREATE TABLE `target_language` (
   `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   `slug` TEXT NOT NULL,
   `name` TEXT NOT NULL,
+  `anglicized_name` TEXT NULL DEFAULT NULL,
   `direction` TEXT NOT NULL DEFAULT ltr,
-  `region` TEXT NOT NULL
+  `region` TEXT NOT NULL,
+  `is_gateway_language` INTEGER NOT NULL DEFAULT 0,
+  UNIQUE(`slug`)
 );
 
 -- ---
