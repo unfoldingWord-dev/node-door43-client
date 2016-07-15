@@ -2,7 +2,7 @@
   "name": "door43-client",
   "version": "0.1.0",
   "description": "A client library for interacting with the Door43 Catalog.",
-  "main": "./lib/door43-client.js",
+  "main": "./lib/index.js",
   "scripts": {
     "test": "gulp test"
   },
@@ -19,6 +19,7 @@
   "devDependencies": {
     "gulp": "^3.9.1",
     "gulp-mocha": "^2.2.0",
+    "jest": "^13.2.3",
     "mocha": "^2.4.5",
     "rimraf": "^2.5.3",
     "yargs": "^4.8.0"
