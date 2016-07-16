@@ -20,10 +20,18 @@ describe('Library', () => {
     var library;
     process.setMaxListeners(0);
 
+    function setUpContext() {
+        var rimraf = require('rimraf');
+        rimraf.sync(config.dbPath);
+        var Library = require('../lib/library');
+        var SqliteHelper = require('../lib/sqlite-helper');
+        library = new Library(new SqliteHelper(config.schemaPath, config.dbPath));
+    }
+
     function alter(object, alteredKeys) {
         var alternate = _.clone(object);
         _.each(alteredKeys, function(value, index) {
-            alternate[value] += ' Alt';
+            alternate[value] += '-alt';
         });
         return alternate;
     }
@@ -110,79 +118,101 @@ describe('Library', () => {
         expect(result).toEqual(null);
     }
 
+    function testMultiple(setter, getterMultiple, object, setterExtraArgs, getterArgs) {
+        var objectAlt = alter(object, ['slug']);
+        setterExtraArgs = setterExtraArgs || [];
 
-    describe('Languages', () => {
+        var fun = library[setter];
+
+        // add first
+        setterExtraArgs.unshift(object);
+        var firstId = fun.apply(null, setterExtraArgs);
+        expect(firstId > 0).toBeTruthy();
+
+        // add second
+        setterExtraArgs.shift();
+        setterExtraArgs.unshift(objectAlt);
+        var secondId = fun.apply(null, setterExtraArgs);
+        expect(secondId > 0).toBeTruthy();
+
+        expect(secondId).not.toEqual(firstId);
+
+        var result = library.getters[getterMultiple].apply(null, getterArgs);
+        expect(result.length > 1).toBeTruthy();
+    }
+
+    describe('SourceLanguage', () => {
+        var language;
+        var languageAlt;
+
         beforeEach(() => {
-            var rimraf = require('rimraf');
-            rimraf.sync(config.dbPath);
-            var Library = require('../lib/library');
-            var SqliteHelper = require('../lib/sqlite-helper');
-            library = new Library(new SqliteHelper(config.schemaPath, config.dbPath));
+            setUpContext();
+            language = {
+                slug: 'en',
+                name: 'English',
+                direction: 'ltr'
+            };
+            languageAlt = alter(language, ['name']);
         });
 
-        describe('SourceLanguage', () => {
-            var language;
-            var languageAlt;
-
-            beforeEach(() => {
-                language = {
-                    slug: 'en',
-                    name: 'English',
-                    direction: 'ltr'
-                };
-                languageAlt = alter(language, ['name']);
-            });
-
-            it('should add a source language to the database', () => {
-                testInsert('addSourceLanguage', 'getSourceLanguage', language);
-            });
-
-            it('should update a source language in the database', () => {
-                testUpdate('addSourceLanguage', 'getSourceLanguage', language, languageAlt);
-            });
-
-            it('should not add incomplete source language to the database', () => {
-                delete language.name;
-                testIncomplete('addSourceLanguage', language);
-            });
-
-            it('it should return null for a missing source language', () => {
-                testMissing('getSourceLanguage', ['missing-lang']);
-            });
+        it('should add a source language to the database', () => {
+            testInsert('addSourceLanguage', 'getSourceLanguage', language);
         });
 
-        describe('TargetLanguage', () => {
-            var language;
-            var languageAlt;
+        it('should update a source language in the database', () => {
+            testUpdate('addSourceLanguage', 'getSourceLanguage', language, languageAlt);
+        });
 
-            beforeEach(() => {
-                language = {
-                    slug: 'en',
-                    name: 'English',
-                    anglicized_name: 'English',
-                    direction: 'ltr',
-                    region: 'United States',
-                    is_gateway_language: 1
-                };
-                languageAlt = alter(language, ['name', 'anglicized_name', 'region']);
-            });
+        it('should not add incomplete source language to the database', () => {
+            delete language.name;
+            testIncomplete('addSourceLanguage', language);
+        });
 
-            it('should add a target language to the database', () => {
-                testInsert('addTargetLanguage', 'getTargetLanguage', language);
-            });
+        it('should return null for a missing source language', () => {
+            testMissing('getSourceLanguage', ['missing-lang']);
+        });
 
-            it('should update a target language in the database', () => {
-                testUpdate('addTargetLanguage', 'getTargetLanguage', language, languageAlt);
-            });
+        it('should return multiple source languages', () => {
+           testMultiple('addSourceLanguage', 'getSourceLanguages', language);
+        });
+    });
 
-            it('should not add incomplete target language to the database', () => {
-                delete language.name;
-                testIncomplete('addTargetLanguage', language);
-            });
+    describe('TargetLanguage', () => {
+        var language;
+        var languageAlt;
 
-            it('it should return null for a missing target language', () => {
-                testMissing('getTargetLanguage', ['missing-lang']);
-            });
+        beforeEach(() => {
+            setUpContext();
+            language = {
+                slug: 'en',
+                name: 'English',
+                anglicized_name: 'English',
+                direction: 'ltr',
+                region: 'United States',
+                is_gateway_language: 1
+            };
+            languageAlt = alter(language, ['name', 'anglicized_name', 'region']);
+        });
+
+        it('should add a target language to the database', () => {
+            testInsert('addTargetLanguage', 'getTargetLanguage', language);
+        });
+
+        it('should update a target language in the database', () => {
+            testUpdate('addTargetLanguage', 'getTargetLanguage', language, languageAlt);
+        });
+
+        it('should not add incomplete target language to the database', () => {
+            delete language.name;
+            testIncomplete('addTargetLanguage', language);
+        });
+
+        it('it should return null for a missing target language', () => {
+            testMissing('getTargetLanguage', ['missing-lang']);
+        });
+
+        it('should return multiple target languages', () => {
+            testMultiple('addTargetLanguage', 'getTargetLanguages', language);
         });
     });
 
@@ -193,11 +223,7 @@ describe('Library', () => {
 
 
         beforeEach(() => {
-            var rimraf = require('rimraf');
-            rimraf.sync(config.dbPath);
-            var Library = require('../lib/library');
-            var SqliteHelper = require('../lib/sqlite-helper');
-            library = new Library(new SqliteHelper(config.schemaPath, config.dbPath));
+            setUpContext();
 
             source_language = {
                 slug: 'en',
@@ -244,5 +270,92 @@ describe('Library', () => {
             testMissing('getProject', ['missing-lang', 'missing-proj']);
         });
 
+        it('should return multiple projects', () => {
+            testMultiple('addProject', 'getProjects', project,
+                [source_language.id], [source_language.slug]);
+        });
+    });
+
+    describe('Resources', () => {
+        var source_language;
+        var project;
+        var resource;
+        var resourceAlt;
+
+        beforeEach(() => {
+            setUpContext();
+
+            source_language = {
+                slug: 'en',
+                name: 'English',
+                direction: 'ltr'
+            };
+            source_language.id = library.addSourceLanguage(source_language);
+            project = {
+                slug: 'gen',
+                name: 'Genesis',
+                desc: 'The book of Genesis',
+                icon: '',
+                sort: 1,
+                chunks_url: 'https://api.unfoldingword.org/bible/txt/1/gen/chunks.json',
+                categories: [{
+                    name: 'Old Testament',
+                    slug: 'bible-ot'
+                }],
+                source_language_slug: source_language.slug,
+                source_language_id: source_language.id
+            };
+            project.id = library.addProject(project, source_language.id);
+            resource = {
+                slug: 'ulb',
+                name: 'Unlocked Literal Bible',
+                translate_mode: 'gl',
+                status: {
+                    checking_level: '3',
+                    comments: 'this is a comment',
+                    pub_date: '2015-12-17',
+                    license: 'CC BY-SA',
+                    version: '3.0'
+                },
+                formats: [{
+                    syntax_version: '1.0',
+                    mime_type: 'application/ts+book',
+                    modified_at: 20151222120130,
+                    url: 'https://api.unfoldingword.org/ts/txt/2/gen/en/ulb/source.json'
+                }],
+                project_id: project.id,
+                project_slug: project.slug,
+                source_language_slug: source_language.slug
+            };
+            resourceAlt = alter(resource, ['name']);
+        });
+
+        it('should add a resource to the database', () => {
+            testInsert('addResource', 'getResource', resource,
+                [project.id], [source_language.slug, project.slug],
+                ['id']);
+        });
+
+        it('should update a resource in the database', () => {
+            testUpdate('addResource', 'getResource', resource, resourceAlt,
+                [source_language.id, project.id], [source_language.slug, project.slug],
+                ['id']);
+        });
+
+        it('should not add incomplete resource to the database', () => {
+            delete resource.name;
+            testIncomplete('addResource', resource, [source_language.id, project.id]);
+        });
+
+        it('it should return null for a missing resource', () => {
+            testMissing('getResource', [source_language.slug, project.slug, 'missing-res']);
+            testMissing('getResource', [source_language.slug, 'missing-proj', 'missing-res']);
+            testMissing('getResource', ['missing-lang', 'missing-proj', 'missing-res']);
+        });
+
+        it('should return multiple resources', () => {
+            testMultiple('addResource', 'getResources', resource,
+                [project.id], [source_language.slug, project.slug]);
+        });
     });
 });
