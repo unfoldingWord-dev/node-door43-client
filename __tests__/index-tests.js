@@ -1,6 +1,6 @@
 'use strict';
 
-jest.unmock('../lib/index.js');
+jest.unmock('../lib/main.js');
 
 describe('Client', () => {
     it('should do stuff', () => {

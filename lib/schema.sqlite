@@ -34,7 +34,7 @@ CREATE TABLE `category_name` (
   `name` TEXT NOT NULL,
   FOREIGN KEY (source_language_id) REFERENCES `source_language` (`id`),
   FOREIGN KEY (category_id) REFERENCES `category` (`id`) ON DELETE CASCADE,
-  UNIQUE(`source_language_id`, `category_id`, `name`)
+  UNIQUE(`source_language_id`, `category_id`)
 );
 
 -- ---
