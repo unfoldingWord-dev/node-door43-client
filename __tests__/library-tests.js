@@ -358,4 +358,41 @@ describe('Library', () => {
                 [project.id], [source_language.slug, project.slug]);
         });
     });
+
+    describe('Catalogs', () => {
+        var catalog;
+        var catalogAlt;
+
+        beforeEach(() => {
+            setUpContext();
+
+            catalog = {
+                slug: 'langnames',
+                url: 'td.unfoldingword.org/exports/langnames.json',
+                modified_at: 20141222120130
+            };
+            catalogAlt = alter(catalog, ['url']);
+        });
+
+        it('should add a catalog to the database', () => {
+            testInsert('addCatalog', 'getCatalog', catalog);
+        });
+
+        it('should update a catalog in the database', () => {
+            testUpdate('addCatalog', 'getCatalog', catalog, catalogAlt);
+        });
+
+        it('should not add incomplete catalog to the database', () => {
+            delete catalog.url;
+            testIncomplete('addCatalog', catalog);
+        });
+
+        it('it should return null for a missing catalog', () => {
+            testMissing('getCatalog', ['missing-cat']);
+        });
+
+        it('should return multiple catalogs', () => {
+            testMultiple('addCatalog', 'getCatalogs', catalog);
+        });
+    });
 });
