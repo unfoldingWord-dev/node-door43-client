@@ -1,9 +1,15 @@
-var gulp = require('gulp'),
-    mocha = require('gulp-mocha'),
-    argv = require('yargs').argv;
+var gulp = require('gulp');
+var mocha = require('gulp-mocha');
+var argv = require('yargs').argv;
+var rimraf = require('rimraf');
+var Door43Client = require('./');
 
-gulp.task('test', function () {
-    return gulp.src('./tests/tests.js', {read:false})
-        .pipe(mocha({reporter: 'spec', grep: (argv.grep || argv.g)}));
+gulp.task('index', function (done) {
+    const catalogUrl = 'https://api.unfoldingword.org/ts/txt/2/catalog.json'
+        , indexPath = './out/library.sqlite'
+        , resourceDir = './out/res';
+    rimraf.sync('./out');
+    client = new Door43Client(indexPath, resourceDir);
+    client.downloadCatalog(catalogUrl).then(done, done);
 });
 gulp.task('default', ['test']);
