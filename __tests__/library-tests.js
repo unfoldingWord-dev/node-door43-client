@@ -1,17 +1,13 @@
 'use strict';
 
-jest.unmock('rimraf');
 jest.unmock('lodash');
 jest.unmock('sql.js');
 jest.unmock('fs');
-jest.unmock('mkdirp');
-jest.unmock('path');
-jest.unmock('../lib/sqlite-helper');
 jest.unmock('../lib/library');
 
 const config = {
     schemaPath: './lib/schema.sqlite',
-    dbPath: './out/test.libary.sqlite'
+    dbPath: null
 };
 
 const _ = require('lodash');
@@ -21,8 +17,6 @@ describe('Library', () => {
     process.setMaxListeners(0);
 
     function setUpContext() {
-        var rimraf = require('rimraf');
-        rimraf.sync(config.dbPath);
         var Library = require('../lib/library');
         var SqliteHelper = require('../lib/sqlite-helper');
         library = new Library(new SqliteHelper(config.schemaPath, config.dbPath));

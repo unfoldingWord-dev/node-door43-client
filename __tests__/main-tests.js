@@ -13,17 +13,19 @@ const config = {
 };
 
 describe('Client', () => {
-    var client, request;
+    var client, request, library;
 
     beforeEach(() => {
         rimraf.sync(config.dbPath);
         rimraf.sync(config.resDir);
         var Client = require('../');
         client = new Client(config.dbPath, config.resDir);
+        var Library = require('../lib/library');
+        library = new Library(null);
+        request = require('../lib/request');
     });
 
-    it('should download the catalog', () => {
-        request = require('../lib/request');
+    it('should index the Door43 catalog', () => {
         request.__setStatusCode = 200;
         request.__queueResponse = JSON.stringify([
             {
@@ -72,10 +74,73 @@ describe('Client', () => {
                 tw_cat: "https://api.unfoldingword.org/obs/txt/1/en/tw_cat-en.json?date_modified=20150924"
             }
         ]);
-        client.updateIndex(config.catalogUrl).then((success) => {
-            expect(success).toEqual(true);
-            // TODO: expect that index methods have been called.
-        });
+        return client.updateIndex(config.catalogUrl)
+            .then((success) => {
+                expect(success).toBeTruthy();
+                expect(library.addProject.mock.calls.length).toEqual(1);
+                expect(library.addSourceLanguage.mock.calls.length).toEqual(1);
+                expect(library.addResource.mock.calls.length).toEqual(1);
+            })
+            .catch(function(err) {
+                throw err;
+            });
+    });
+
+    it('should download a global catalog', () => {
+        library.__setResponse = {
+            slug: 'langnames',
+            url: 'http://td.unfoldingword.org/exports/langnames.json',
+            modified_at: 0,
+            id: 1
+        };
+        request.__queueResponse = JSON.stringify([
+            {
+                ang: "Afar",
+                pk: 6,
+                lr: "Africa",
+                ln: "Afaraf",
+                cc: [
+                    "DJ",
+                    "ER",
+                    "ET",
+                    "US",
+                    "CA"
+                ],
+                ld: "ltr",
+                gw: false,
+                lc: "aa",
+                alt: [
+                    "Afaraf",
+                    "Danakil",
+                    "Denkel",
+                    "Adal",
+                    "Afar Af",
+                    "Qafar",
+                    "Baadu (Ba'adu)"
+                ]
+            },
+            {
+                ang: "Ghotuo",
+                pk: 7,
+                lr: "Africa",
+                ln: "Ghotuo",
+                cc: [
+                    "NG"
+                ],
+                ld: "ltr",
+                gw: false,
+                lc: "aaa",
+                alt: [ ]
+            }
+        ]);
+        return client.downloadCatalog('langnames')
+            .then(() => {
+                expect(library.addTargetLanguage.mock.calls.length).toEqual(2);
+            })
+            .catch(function(err) {
+                throw err;
+            });
+
     });
 
     it('should download a resource container', () => {
