@@ -10,6 +10,6 @@ gulp.task('index', function (done) {
         , resourceDir = './out/res';
     rimraf.sync('./out');
     client = new Door43Client(indexPath, resourceDir);
-    client.downloadCatalog(catalogUrl).then(done, done);
+    client.updateIndex(catalogUrl).then(done, done);
 });
 gulp.task('default', ['test']);

@@ -11,7 +11,7 @@ jest.unmock('../lib/library');
 
 const config = {
     schemaPath: './lib/schema.sqlite',
-    dbPath: './out/test.sqlite'
+    dbPath: './out/test.libary.sqlite'
 };
 
 const _ = require('lodash');
