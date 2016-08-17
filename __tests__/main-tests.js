@@ -146,7 +146,37 @@ describe('Client', () => {
 
     });
 
-    // TODO: test catalog download failing
+    it('should not download a missing global catalog', () => {
+        library.__setResponse = null;
+
+        return client.downloadCatalog('langnames')
+            .then(() => {
+                expect(library.addTargetLanguage.mock.calls.length).toEqual(0);
+            })
+            .catch(function(err) {
+                expect(err.message).toEqual('Unknown catalog');
+            });
+
+    });
+
+    it('should fail to download a global catalog', () => {
+        library.__setResponse = {
+            slug: 'langnames',
+            url: 'http://td.unfoldingword.org/exports/langnames.json',
+            modified_at: 0,
+            id: 1
+        };
+        request.__setStatusCode = 400;
+
+        return client.downloadCatalog('langnames')
+            .then(() => {
+                expect(library.addTargetLanguage.mock.calls.length).toEqual(0);
+            })
+            .catch(function(err) {
+                expect(err.status).toEqual(400);
+            });
+
+    });
 
     it('should download a resource container', () => {
         library.__setResponse = {
@@ -163,8 +193,7 @@ describe('Client', () => {
         };
 
         return client.downloadResourceContainer('en', 'obs', 'obs')
-            .then((success) => {
-                expect(success).toBeTruthy();
+            .then(() => {
                 expect(request.download.mock.calls.length).toEqual(1);
             })
             .catch(function(err) {
@@ -172,7 +201,86 @@ describe('Client', () => {
             });
     });
 
-    // TODO: test resource container download failing
+
+    it('should not download a missing resource container', () => {
+        library.__setResponse = null;
+
+        return client.downloadResourceContainer('en', 'obs', 'obs')
+            .then(() => {
+                throw Error();
+            })
+            .catch(function(err) {
+                expect(err.message).toEqual('Unknown resource');
+                expect(request.download.mock.calls.length).toEqual(0);
+            });
+    });
+
+    it('should not download a missing resource container format', () => {
+        library.__setResponse = {
+            id: 1,
+            slug: 'obs',
+            formats: [
+                {
+                    syntax_version: '1.0',
+                    mime_type: 'pdf',
+                    modified_at: 0,
+                    url: 'some/url',
+                }
+            ]
+        };
+
+        return client.downloadResourceContainer('en', 'obs', 'obs')
+            .then(() => {
+                throw Error();
+            })
+            .catch(function(err) {
+                expect(err.message).toEqual('Missing resource container format');
+                expect(request.download.mock.calls.length).toEqual(0);
+            });
+    });
+
+    it('should not download a resource container with no formats', () => {
+        library.__setResponse = {
+            id: 1,
+            slug: 'obs',
+            formats: []
+        };
+
+        return client.downloadResourceContainer('en', 'obs', 'obs')
+            .then(() => {
+                throw Error();
+            })
+            .catch(function(err) {
+                expect(err.message).toEqual('Missing resource container format');
+                expect(request.download.mock.calls.length).toEqual(0);
+            });
+    });
+
+    it('should fail downloading a resource container', () => {
+        library.__setResponse = {
+            id: 1,
+            slug: 'obs',
+            formats: [
+                {
+                    syntax_version: '1.0',
+                    mime_type: 'application/ts+book',
+                    modified_at: 0,
+                    url: 'some/url',
+                }
+            ]
+        };
+        request.__setStatusCode = 400;
+
+        return client.downloadResourceContainer('en', 'obs', 'obs')
+            .then(() => {
+                throw Error();
+            })
+            .catch(function(err) {
+                expect(err.status).toEqual(400);
+                expect(request.download.mock.calls.length).toEqual(1);
+            });
+    });
+
 
 
 });
