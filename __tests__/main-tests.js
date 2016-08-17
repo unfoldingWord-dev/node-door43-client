@@ -75,8 +75,7 @@ describe('Client', () => {
             }
         ]);
         return client.updateIndex(config.catalogUrl)
-            .then((success) => {
-                expect(success).toBeTruthy();
+            .then(() => {
                 expect(library.addProject.mock.calls.length).toEqual(1);
                 expect(library.addSourceLanguage.mock.calls.length).toEqual(1);
                 expect(library.addResource.mock.calls.length).toEqual(1);
@@ -86,8 +85,19 @@ describe('Client', () => {
             });
     });
 
-    // TODO: test parts of update failing.
-    // TODO: pass parameter to index update that will allow it to be lazy (not fail if an item fails).
+    it('should fail to index the Door43 catalog', () => {
+        request.__setStatusCode = 400;
+        return client.updateIndex(config.catalogUrl)
+            .then(() => {
+                throw new Error();
+            })
+            .catch(function(err) {
+                expect(err.status).toEqual(400);
+                expect(library.addProject.mock.calls.length).toEqual(0);
+                expect(library.addSourceLanguage.mock.calls.length).toEqual(0);
+                expect(library.addResource.mock.calls.length).toEqual(0);
+            });
+    });
 
     it('should download a global catalog', () => {
         library.__setResponse = {
