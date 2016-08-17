@@ -86,6 +86,9 @@ describe('Client', () => {
             });
     });
 
+    // TODO: test parts of update failing.
+    // TODO: pass parameter to index update that will allow it to be lazy (not fail if an item fails).
+
     it('should download a global catalog', () => {
         library.__setResponse = {
             slug: 'langnames',
@@ -143,9 +146,33 @@ describe('Client', () => {
 
     });
 
-    it('should download a resource container', () => {
+    // TODO: test catalog download failing
 
+    it('should download a resource container', () => {
+        library.__setResponse = {
+            id: 1,
+            slug: 'obs',
+            formats: [
+                {
+                    syntax_version: '1.0',
+                    mime_type: 'application/ts+book',
+                    modified_at: 0,
+                    url: 'some/url',
+                }
+            ]
+        };
+
+        return client.downloadResourceContainer('en', 'obs', 'obs')
+            .then((success) => {
+                expect(success).toBeTruthy();
+                expect(request.download.mock.calls.length).toEqual(1);
+            })
+            .catch(function(err) {
+                throw err;
+            });
     });
+
+    // TODO: test resource container download failing
 
 
 });
