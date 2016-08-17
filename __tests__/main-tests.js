@@ -1,8 +1,11 @@
 'use strict';
 
-jest.unmock('../lib/utils');
+jest.unmock('fs');
+jest.unmock('mkdirp');
 jest.unmock('rimraf');
+jest.unmock('../lib/utils');
 jest.unmock('../lib/main');
+jest.unmock('yamljs');
 
 var rimraf = require('rimraf');
 
@@ -100,7 +103,7 @@ describe('Client', () => {
     });
 
     it('should download a global catalog', () => {
-        library.__setResponse = {
+        library.__queueResponse = {
             slug: 'langnames',
             url: 'http://td.unfoldingword.org/exports/langnames.json',
             modified_at: 0,
@@ -157,7 +160,7 @@ describe('Client', () => {
     });
 
     it('should not download a missing global catalog', () => {
-        library.__setResponse = null;
+        library.__queueResponse = null;
 
         return client.downloadCatalog('langnames')
             .then(() => {
@@ -170,7 +173,7 @@ describe('Client', () => {
     });
 
     it('should fail to download a global catalog', () => {
-        library.__setResponse = {
+        library.__queueResponse = {
             slug: 'langnames',
             url: 'http://td.unfoldingword.org/exports/langnames.json',
             modified_at: 0,
@@ -189,7 +192,7 @@ describe('Client', () => {
     });
 
     it('should download a resource container', () => {
-        library.__setResponse = {
+        library.__queueResponse = {
             id: 1,
             slug: 'obs',
             formats: [
@@ -213,7 +216,7 @@ describe('Client', () => {
 
 
     it('should not download a missing resource container', () => {
-        library.__setResponse = null;
+        library.__queueResponse = null;
 
         return client.downloadResourceContainer('en', 'obs', 'obs')
             .then(() => {
@@ -226,7 +229,7 @@ describe('Client', () => {
     });
 
     it('should not download a missing resource container format', () => {
-        library.__setResponse = {
+        library.__queueResponse = {
             id: 1,
             slug: 'obs',
             formats: [
@@ -250,7 +253,7 @@ describe('Client', () => {
     });
 
     it('should not download a resource container with no formats', () => {
-        library.__setResponse = {
+        library.__queueResponse = {
             id: 1,
             slug: 'obs',
             formats: []
@@ -267,7 +270,7 @@ describe('Client', () => {
     });
 
     it('should fail downloading a resource container', () => {
-        library.__setResponse = {
+        library.__queueResponse = {
             id: 1,
             slug: 'obs',
             formats: [
@@ -291,6 +294,113 @@ describe('Client', () => {
             });
     });
 
+    it('should build a resource container', () => {
+        var fs = require('fs');
 
+        library.__queueResponse = {
+            id: 1,
+            slug: 'en',
+            name: 'English',
+            direction: 'ltr'
+        };
+        library.__queueResponse = {
+            id: 1,
+            slug: 'obs',
+            name: 'Open Bible Stories',
+            desc: 'T',
+            icon: '',
+            sort: 0,
+            chunks_url: '',
+            categories: [],
+            source_language_slug: 'en',
+            source_language_id: 1
+        };
+        library.__queueResponse = {
+            id: 1,
+            slug: 'obs',
+            name: 'Open Bible Stories',
+            status: {
+                translate_mode: 'all',
+                checking_entity: [
+                    'Wycliffe Associates'
+                ],
+                checking_level: '3',
+                comments: 'this is a comment',
+                contributors: [
+                    'Wycliffe Associates'
+                ],
+                pub_date: '2015-12-17',
+                license: 'CC BY-SA',
+                checks_performed: [
+                    'keyword',
+                    'metaphor'
+                ],
+                source_translations: [
+                    {
+                        language_slug: 'en',
+                        resource_slug: 'obs',
+                        version: '3.0'
+                    }
+                ],
+                version: '3.0'
+            },
+            formats: [{
+                syntax_version: '1.0',
+                mime_type: 'application/ts+book',
+                modified_at: 20151222120130,
+                url: 'https://api.unfoldingword.org/ts/txt/2/obs/en/obs/source.json'
+            }],
+            project_id: 1,
+            project_slug: 'obs',
+            source_language_slug: 'en'
+        };
 
+        var data = {
+            chapters: [
+                {
+                    frames: [
+                        {
+                            id: "01-01",
+                            img: "https://api.unfoldingword.org/obs/jpg/1/en/360px/obs-en-01-01.jpg",
+                            text: "This is how the beginning of everything happened. God created the universe and everything in it in six days. After God created the earth it was dark and empty, and nothing had been formed in it. But God’s Spirit was there over the water."
+                        },
+                        {
+                            id: "01-02",
+                            img: "https://api.unfoldingword.org/obs/jpg/1/en/360px/obs-en-01-02.jpg",
+                            text: "Then God said, “Let there be light!” And there was light. God saw that the light was good and called it “day.” He separated it from the darkness, which he called “night.” God created the light on the first day of creation."
+                        }
+                    ],
+                    number: "01",
+                    ref: "A Bible story from: Genesis 1-2",
+                    title: "1. The Creation"
+                },
+                {
+                    frames: [
+                        {
+                            id: "02-01",
+                            img: "https://api.unfoldingword.org/obs/jpg/1/en/360px/obs-en-02-01.jpg",
+                            text: "Adam and his wife were very happy living in the beautiful garden God had made for them. Neither of them wore clothes, but this did not cause them to feel any shame, because there was no sin in the world. They often walked in the garden and talked with God."
+                        },
+                        {
+                            id: "02-02",
+                            img: "https://api.unfoldingword.org/obs/jpg/1/en/360px/obs-en-02-02.jpg",
+                            text: "But there was a crafty snake in the garden. He asked the woman, “Did God really tell you not to eat the fruit from any of the trees in the garden?”"
+                        }
+                    ],
+                    number: "02",
+                    ref: "A Bible story from: Genesis 3",
+                    title: "2. Sin Enters the World"
+                }
+            ]
+        };
+
+        return client.makeResourceContainer('en', 'obs', 'book', 'obs', JSON.stringify(data))
+            .then(function() {
+                // TODO: test
+                // expect(fs.writeFile.mock.calls.length).toEqual(1);
+            })
+            .catch(function(err) {
+                throw err;
+            });
+    });
 });

@@ -20,13 +20,14 @@
     "gulp": "^3.9.1",
     "gulp-mocha": "^2.2.0",
     "jest": "^13.2.3",
-    "mocha": "^2.4.5",
-    "rimraf": "^2.5.3",
-    "yargs": "^4.8.0"
+    "mocha": "^2.4.5"
   },
   "dependencies": {
     "lodash": "^4.13.1",
     "mkdirp": "^0.5.1",
-    "sql.js": "^0.2.21"
+    "sql.js": "^0.2.21",
+    "rimraf": "^2.5.3",
+    "yamljs": "^0.2.8",
+    "yargs": "^4.8.0"
   }
 }
