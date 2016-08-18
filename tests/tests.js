@@ -1,7 +1,7 @@
 ;(function() {
     var assert = require('assert'),
         Door43Client = require('../'),
-        utils = require('../lib/utils'),
+        promiseUtils = require('../lib/utils/promises'),
         rimraf = require('rimraf');
 
     const catalogUrl = 'https://api.unfoldingword.org/ts/txt/2/catalog.json'
@@ -39,7 +39,7 @@
                         countdata[lang.slug] = {};
                         list.push(lang.slug);
                     }
-                    return utils.chain(client.index.getProjects, function(err, data) {
+                    return promiseUtils.chain(client.index.getProjects, function(err, data) {
                         console.error(err.message);
                         return false;
                     })(list);
@@ -54,7 +54,7 @@
                             });
                         }
                     }
-                    return utils.chain(utilGetResources, function(err, data) {
+                    return promiseUtils.chain(utilGetResources, function(err, data) {
                         console.error(err.message);
                         return false;
                     })(list);
@@ -74,7 +74,7 @@
                     for(var lang of languages) {
                         list.push(lang.slug);
                     }
-                    return utils.chain(client.index.getProjects, function(err, data) {
+                    return promiseUtils.chain(client.index.getProjects, function(err, data) {
                         console.error(err.message);
                         return false;
                     })(list);
@@ -89,7 +89,7 @@
                             });
                         }
                     }
-                    return utils.chain(utilGetResources, function(err, data) {
+                    return promiseUtils.chain(utilGetResources, function(err, data) {
                         console.error(err.message);
                         return false;
                     })(list);

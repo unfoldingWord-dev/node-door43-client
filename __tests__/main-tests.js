@@ -3,7 +3,7 @@
 jest.unmock('fs');
 jest.unmock('mkdirp');
 jest.unmock('rimraf');
-jest.unmock('../lib/utils');
+jest.unmock('../lib/utils/promises');
 jest.unmock('../lib/main');
 jest.unmock('yamljs');
 

@@ -2,7 +2,7 @@ var gulp = require('gulp');
 var mocha = require('gulp-mocha');
 var argv = require('yargs').argv;
 var rimraf = require('rimraf');
-var utils = require('./lib/utils');
+var promiseUtils = require('./lib/utils/promises');
 var Door43Client = require('./');
 var readline = require('readline');
 
@@ -30,14 +30,14 @@ gulp.task('index', function (done) {
 });
 
 gulp.task('download', function (done) {
-    var client = new Door43Client(indexPath, resourceDir, {compression_method:'zip'});
+    var client = new Door43Client(indexPath, resourceDir, {compression_method:'tar'});
     client.index.getSourceLanguages()
         .then(function(languages) {
             var list = [];
             for(var language of languages) {
                 list.push(language.slug);
             }
-            return utils.chain(client.index.getProjects, function(err, data){
+            return promiseUtils.chain(client.index.getProjects, function(err, data){
                 console.log(err);
                 return false;
             })(list);
@@ -52,7 +52,7 @@ gulp.task('download', function (done) {
                     });
                 }
             }
-            return utils.chain(client.index.getResources, function(err, data) {
+            return promiseUtils.chain(client.index.getResources, function(err, data) {
                 console.log(err);
                 return false;
             })(list);
@@ -69,7 +69,7 @@ gulp.task('download', function (done) {
                 }
             }
             console.log('Downloading ' + list.length + ' items...');
-            return utils.chain(client.downloadResourceContainer, function(err, data) {
+            return promiseUtils.chain(client.downloadResourceContainer, function(err, data) {
 
                 if(err.message === 'Resource container already exists') {
                     readline.cursorTo(process.stdout, 0);
