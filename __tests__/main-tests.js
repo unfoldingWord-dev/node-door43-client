@@ -398,9 +398,7 @@ describe('Client', () => {
         return client.makeResourceContainer('en', 'obs', 'book', 'obs', JSON.stringify(data))
             .then(function() {
                 // TODO: test
-            })
-            .catch(function(err) {
-                throw err;
+                expect(true).toBeTruthy();
             });
     });
 });

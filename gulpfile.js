@@ -30,7 +30,7 @@ gulp.task('index', function (done) {
 });
 
 gulp.task('download', function (done) {
-    var client = new Door43Client(indexPath, resourceDir, {compression_method:'tar'});
+    var client = new Door43Client(indexPath, resourceDir, {compression_method:'zip'});
     client.index.getSourceLanguages()
         .then(function(languages) {
             var list = [];
