@@ -303,8 +303,8 @@ describe('Library', () => {
             resource = {
                 slug: 'ulb',
                 name: 'Unlocked Literal Bible',
-                translate_mode: 'gl',
                 status: {
+                    translate_mode: 'gl',
                     checking_level: '3',
                     comments: 'this is a comment',
                     pub_date: '2015-12-17',

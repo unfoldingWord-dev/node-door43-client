@@ -79,9 +79,9 @@ describe('Client', () => {
         ]);
         return client.updateIndex(config.catalogUrl)
             .then(() => {
-                expect(library.addProject.mock.calls.length).toEqual(1);
+                expect(library.addProject.mock.calls.length).toEqual(2); // project, words
                 expect(library.addSourceLanguage.mock.calls.length).toEqual(1);
-                expect(library.addResource.mock.calls.length).toEqual(1);
+                expect(library.addResource.mock.calls.length).toEqual(4); // content, notes, questions, words
             })
             .catch(function(err) {
                 throw err;
