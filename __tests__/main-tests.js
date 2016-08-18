@@ -205,7 +205,8 @@ describe('Client', () => {
             ]
         };
 
-        return client.downloadResourceContainer('en', 'obs', 'obs')
+
+        return client.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 expect(request.download.mock.calls.length).toEqual(1);
             })
@@ -218,7 +219,7 @@ describe('Client', () => {
     it('should not download a missing resource container', () => {
         library.__queueResponse = null;
 
-        return client.downloadResourceContainer('en', 'obs', 'obs')
+        return client.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 throw Error();
             })
@@ -242,7 +243,7 @@ describe('Client', () => {
             ]
         };
 
-        return client.downloadResourceContainer('en', 'obs', 'obs')
+        return client.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 throw Error();
             })
@@ -259,7 +260,7 @@ describe('Client', () => {
             formats: []
         };
 
-        return client.downloadResourceContainer('en', 'obs', 'obs')
+        return client.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 throw Error();
             })
@@ -284,7 +285,7 @@ describe('Client', () => {
         };
         request.__setStatusCode = 400;
 
-        return client.downloadResourceContainer('en', 'obs', 'obs')
+        return client.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 throw Error();
             })
@@ -397,7 +398,6 @@ describe('Client', () => {
         return client.makeResourceContainer('en', 'obs', 'book', 'obs', JSON.stringify(data))
             .then(function() {
                 // TODO: test
-                // expect(fs.writeFile.mock.calls.length).toEqual(1);
             })
             .catch(function(err) {
                 throw err;

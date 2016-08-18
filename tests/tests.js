@@ -120,7 +120,7 @@
         
         describe('@Server Calls', function() {
             it('downloads a resource container from the api and stores it', (done) => {
-                client.downloadResourceContainer('en', 'gen', 'ulb').then((result) => {
+                client.downloadFutureCompatibleResourceContainer('en', 'gen', 'ulb').then((result) => {
                     assert(result === true);
                 }).then(done, done);
             });
