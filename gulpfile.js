@@ -26,6 +26,9 @@ gulp.task('index', function (done) {
     client.updateIndex(catalogUrl, function(total, completed) {
         var percent = Math.round(10 * (100 * completed) / total) / 10;
         writePercent(percent);
+    }).then(function() {
+        console.log();
+        return Promise.resolve();
     }).then(done, done);
 });
 
@@ -74,11 +77,11 @@ gulp.task('download', function (done) {
                 if(err.message === 'Resource container already exists') {
                     readline.cursorTo(process.stdout, 0);
                     readline.clearLine(process.stdout, 0);
-                    console.log('Skipping', data);
+                    console.log('\nSkipping', data);
                 } else {
                     readline.cursorTo(process.stdout, 0);
                     readline.clearLine(process.stdout, 0);
-                    console.log(err, 'while downloading', data);
+                    console.log('\n', err, 'while downloading', data);
                 }
                 return false;
             }, {compact: true, onProgress: function(total, completed) {
@@ -88,6 +91,7 @@ gulp.task('download', function (done) {
         })
         .then(function(paths) {
             // so gulp doesn't choke
+            console.log();
             return Promise.resolve();
         })
         .then(done, done);
