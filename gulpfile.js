@@ -14,15 +14,16 @@ gulp.task('index', function (done) {
         , indexPath = './out/library.sqlite'
         , resourceDir = './out/res';
     var client = new Door43Client(indexPath, resourceDir);
-    client.updateIndex(catalogUrl).then(done, done);
+    client.updateIndex(catalogUrl, function(total, completed) {
+        var percent = Math.round(10 * (100 * completed) / total) / 10;
+        console.log(percent + '%');
+    }).then(done, done);
 });
 gulp.task('download', function (done) {
-    const catalogUrl = 'https://api.unfoldingword.org/ts/txt/2/catalog.json'
-        , indexPath = './out/library.sqlite'
+    const indexPath = './out/library.sqlite'
         , resourceDir = './out/res';
     rimraf.sync(resourceDir);
     var client = new Door43Client(indexPath, resourceDir);
-    // var list = [];
 
     client.index.getSourceLanguages()
         .then(function(languages) {
@@ -51,7 +52,7 @@ gulp.task('download', function (done) {
             })(list);
         })
         .then(function(resourceGroups) {
-            list = [];
+            var list = [];
             for(var group of resourceGroups) {
                 for(var resource of group) {
                     list.push({
@@ -62,10 +63,13 @@ gulp.task('download', function (done) {
                 }
             }
             console.log('Downloading ' + list.length + ' items...');
-            // utils.chain(client.downloadResourceContainer, function(err, data) {
-            //     console.log(err);
-            //     return false;
-            // })(list);
+            utils.chain(client.downloadResourceContainer, function(err, data) {
+                console.log(err, 'while downloading', data);
+                return false;
+            }, {compact: true, onProgress: function(total, completed) {
+                var percent = Math.round(10 * (100 * completed) / total) / 10;
+                console.log(percent + '%');
+            }})(list);
         })
         .then(done, done);
 });

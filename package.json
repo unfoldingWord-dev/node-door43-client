@@ -23,10 +23,11 @@
     "mocha": "^2.4.5"
   },
   "dependencies": {
+    "archiver": "^1.0.1",
     "lodash": "^4.13.1",
     "mkdirp": "^0.5.1",
-    "sql.js": "^0.2.21",
     "rimraf": "^2.5.3",
+    "sql.js": "^0.2.21",
     "yamljs": "^0.2.8",
     "yargs": "^4.8.0"
   }
