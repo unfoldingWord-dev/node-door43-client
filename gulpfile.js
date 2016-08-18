@@ -4,6 +4,13 @@ var argv = require('yargs').argv;
 var rimraf = require('rimraf');
 var utils = require('./lib/utils');
 var Door43Client = require('./');
+var readline = require('readline');
+
+function writePercent(percent) {
+    readline.cursorTo(process.stdout, 0);
+    readline.clearLine(process.stdout, 0);
+    process.stdout.write(percent + '%');
+}
 
 gulp.task('clean', function (done) {
     rimraf.sync('./out');
@@ -16,7 +23,7 @@ gulp.task('index', function (done) {
     var client = new Door43Client(indexPath, resourceDir);
     client.updateIndex(catalogUrl, function(total, completed) {
         var percent = Math.round(10 * (100 * completed) / total) / 10;
-        console.log(percent + '%');
+        writePercent(percent);
     }).then(done, done);
 });
 gulp.task('download', function (done) {
@@ -58,18 +65,22 @@ gulp.task('download', function (done) {
                     list.push({
                         languageSlug: resource.source_language_slug,
                         projectSlug: resource.project_slug,
-                        resourceSlug: resource.slug
+                        resourceSlug: resource.slug,
                     });
                 }
             }
             console.log('Downloading ' + list.length + ' items...');
-            utils.chain(client.downloadResourceContainer, function(err, data) {
+            return utils.chain(client.downloadResourceContainer, function(err, data) {
                 console.log(err, 'while downloading', data);
                 return false;
             }, {compact: true, onProgress: function(total, completed) {
                 var percent = Math.round(10 * (100 * completed) / total) / 10;
-                console.log(percent + '%');
+                writePercent(percent);
             }})(list);
+        })
+        .then(function(paths) {
+            // so gulp doesn't choke
+            return Promise.resolve();
         })
         .then(done, done);
 });
