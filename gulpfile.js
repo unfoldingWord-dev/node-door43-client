@@ -23,7 +23,7 @@ gulp.task('clean', function (done) {
 
 gulp.task('index', function (done) {
     var client = new Door43Client(indexPath, resourceDir);
-    client.updateIndex(catalogUrl, function(total, completed) {
+    client.updatePrimaryIndex(catalogUrl, function(total, completed) {
         var percent = Math.round(10 * (100 * completed) / total) / 10;
         writePercent(percent);
     }).then(function() {
@@ -47,6 +47,30 @@ gulp.task('download', function (done) {
         }
     };
 
+    if(argv.catalogs) {
+        client.index.getCatalogs()
+            .then(function(catalogs) {
+                var list = [];
+                for(var catalog of catalogs) {
+                    list.push(catalog.slug);
+                }
+                return promiseUtils.chain(client.updateCatalogIndex, function (err, data) {
+                    console.log(err);
+                    return false;
+                }, {compact: true, onProgress: function(total, completed) {
+                    var percent = Math.round(10 * (100 * completed) / total) / 10;
+                    writePercent(percent);
+                }})(list);
+            })
+            .then(function() {
+                // so gulp doesn't choke
+                console.log();
+                return Promise.resolve();
+            })
+            .then(done, done);
+        return;
+    }
+
     getLanguages(argv.lang)
         .then(function(languages) {
             var list = [];
@@ -66,14 +90,10 @@ gulp.task('download', function (done) {
             };
 
             if(argv.proj) {
-                return promiseUtils.chain(client.index.getProject, errHandler)(list)
-                    .then(function(projectGroups) {
-                        return projectGroups;
-                    });
+                return promiseUtils.chain(client.index.getProject, errHandler)(list);
             } else {
                 return promiseUtils.chain(client.index.getProjects, errHandler)(list);
             }
-
         })
         .then(function(projectGroups) {
             var list = [];
@@ -120,7 +140,7 @@ gulp.task('download', function (done) {
                 writePercent(percent);
             }})(list);
         })
-        .then(function(paths) {
+        .then(function() {
             // so gulp doesn't choke
             console.log();
             return Promise.resolve();

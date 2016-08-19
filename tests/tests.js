@@ -21,7 +21,7 @@
             });
 
             it('downloads the resource catalog from the api and indexes it', (done) => {
-                client.updateIndex(catalogUrl, 'gen').then(() => {
+                client.updatePrimaryIndex(catalogUrl, 'gen').then(() => {
                     return client.index.getSourceLanguages();
                 }).then((languages) => {
                     assert(languages.length > 0);
@@ -64,7 +64,7 @@
                             countdata[res.language_slug][res.project_slug][res.slug] = {};
                         }
                     }
-                    return client.updateIndex(catalogUrl, 'gen');
+                    return client.updatePrimaryIndex(catalogUrl, 'gen');
                 }).then(() => {
                     // begin comparing counts
                     return client.index.getSourceLanguages();
@@ -112,7 +112,7 @@
             });
 
             it('downloads the resource catalog from the api and indexes it', (done) => {
-                client.updateIndex(catalogUrl).then(() => {
+                client.updatePrimaryIndex(catalogUrl).then(() => {
                     assert(client.index.getSourceLanguages().length > 0);
                 }).then(done, done);
             });

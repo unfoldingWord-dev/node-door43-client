@@ -77,7 +77,7 @@ describe('Client', () => {
                 tw_cat: "https://api.unfoldingword.org/obs/txt/1/en/tw_cat-en.json?date_modified=20150924"
             }
         ]);
-        return client.updateIndex(config.catalogUrl)
+        return client.updatePrimaryIndex(config.catalogUrl)
             .then(() => {
                 expect(library.addProject.mock.calls.length).toEqual(2); // project, words
                 expect(library.addSourceLanguage.mock.calls.length).toEqual(1);
@@ -90,7 +90,7 @@ describe('Client', () => {
 
     it('should fail to index the Door43 catalog', () => {
         request.__setStatusCode = 400;
-        return client.updateIndex(config.catalogUrl)
+        return client.updatePrimaryIndex(config.catalogUrl)
             .then(() => {
                 throw new Error();
             })
@@ -149,7 +149,7 @@ describe('Client', () => {
                 alt: [ ]
             }
         ]);
-        return client.downloadCatalog('langnames')
+        return client.updateCatalogIndex('langnames')
             .then(() => {
                 expect(library.addTargetLanguage.mock.calls.length).toEqual(2);
             })
@@ -162,7 +162,7 @@ describe('Client', () => {
     it('should not download a missing global catalog', () => {
         library.__queueResponse = null;
 
-        return client.downloadCatalog('langnames')
+        return client.updateCatalogIndex('langnames')
             .then(() => {
                 expect(library.addTargetLanguage.mock.calls.length).toEqual(0);
             })
@@ -181,7 +181,7 @@ describe('Client', () => {
         };
         request.__setStatusCode = 400;
 
-        return client.downloadCatalog('langnames')
+        return client.updateCatalogIndex('langnames')
             .then(() => {
                 expect(library.addTargetLanguage.mock.calls.length).toEqual(0);
             })
