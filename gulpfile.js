@@ -33,21 +33,52 @@ gulp.task('index', function (done) {
 });
 
 gulp.task('download', function (done) {
-    var client = new Door43Client(indexPath, resourceDir, {compression_method:'tar'});
-    client.index.getSourceLanguages()
+    var compression = 'tar';
+    if(argv.zip) compression = 'zip';
+    var client = new Door43Client(indexPath, resourceDir, {compression_method:compression});
+    var getLanguages = function(lang) {
+        if(lang) {
+            return client.index.getSourceLanguage(lang)
+                .then(function(language) {
+                    return [language];
+                });
+        } else {
+            return client.index.getSourceLanguages();
+        }
+    };
+
+    getLanguages(argv.lang)
         .then(function(languages) {
             var list = [];
             for(var language of languages) {
-                list.push(language.slug);
+                if(argv.proj) {
+                    list.push({
+                        languageSlug: language.slug,
+                        projectSlug: argv.proj
+                    })
+                } else {
+                    list.push(language.slug);
+                }
             }
-            return promiseUtils.chain(client.index.getProjects, function(err, data){
+            var errHandler = function(err, data){
                 console.log(err);
                 return false;
-            })(list);
+            };
+
+            if(argv.proj) {
+                return promiseUtils.chain(client.index.getProject, errHandler)(list)
+                    .then(function(projectGroups) {
+                        return projectGroups;
+                    });
+            } else {
+                return promiseUtils.chain(client.index.getProjects, errHandler)(list);
+            }
+
         })
         .then(function(projectGroups) {
             var list = [];
             for(var group of projectGroups) {
+                if(group.constructor !== Array) group = [group];
                 for(project of group) {
                     list.push({
                         projectSlug: project.slug,
