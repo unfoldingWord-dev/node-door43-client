@@ -98,7 +98,7 @@ DROP TABLE IF EXISTS `resource_format`;
 
 CREATE TABLE `resource_format` (
   `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
-  `syntax_version` TEXT NOT NULL,
+  `package_version` TEXT NOT NULL,
   `mime_type` TEXT NOT NULL,
   `modified_at` INTEGER NOT NULL DEFAULT 0,
   `url` TEXT NOT NULL,
@@ -236,11 +236,10 @@ CREATE TABLE `chunk_marker` (
   `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   `chapter` TEXT NOT NULL,
   `verse` TEXT NOT NULL,
+  `project_slug` TEXT NOT NULL,
   `versification_id` INTEGER NOT NULL,
-  `project_id` INTEGER NOT NULL,
-  UNIQUE (`versification_id`, `chapter`, `verse`),
-  FOREIGN KEY (versification_id) REFERENCES `versification` (`id`) ON DELETE CASCADE,
-  FOREIGN KEY (project_id) REFERENCES `project` (`id`) ON DELETE CASCADE
+  UNIQUE (`versification_id`, `project_slug`, `chapter`, `verse`),
+  FOREIGN KEY (versification_id) REFERENCES `versification` (`id`) ON DELETE CASCADE
 );
 
 -- ---

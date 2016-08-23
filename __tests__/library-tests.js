@@ -495,13 +495,13 @@ describe('Library', () => {
         });
 
         it('should add a chunk marker to the database', () => {
-            testInsert('addChunkMarker', 'getChunkMarker', chunk, [project.id, versification.id],
+            testInsert('addChunkMarker', 'getChunkMarker', chunk, [project.slug, versification.id],
                 [project.slug, versification.slug], ['versification_id', 'project_id']);
         });
 
         it('should not add incomplete chunk marker to the database', () => {
             delete chunk.chapter;
-            testIncomplete('addChunkMarker', chunk, [project.id, versification.id]);
+            testIncomplete('addChunkMarker', chunk, [project.slug, versification.id]);
         });
 
         it('should return null for a missing chunk marker', () => {
@@ -509,9 +509,9 @@ describe('Library', () => {
         });
 
         it('should return multiple chunk markers', () => {
-            let firstId = library.addChunkMarker(chunk, project.id, versification.id);
+            let firstId = library.addChunkMarker(chunk, project.slug, versification.id);
             expect(firstId > 0).toBeTruthy();
-            let secondId = library.addChunkMarker(chunkAlt, project.id, versification.id);
+            let secondId = library.addChunkMarker(chunkAlt, project.slug, versification.id);
             expect(secondId > 0).toBeTruthy();
 
             expect(secondId).not.toEqual(firstId);
