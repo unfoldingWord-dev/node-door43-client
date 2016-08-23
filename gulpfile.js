@@ -24,7 +24,8 @@ function writeProgress(id, total, completed) {
     var progressTitles = {
         projects: 'Indexing Projects',
         chunks: 'Indexing Chunks',
-        resources: 'Indexing Resources'
+        resources: 'Indexing Resources',
+        container: 'Downloading Containers'
     };
     process.stdout.write(progressTitles[id] + ' ' + percent + '%');
 }
@@ -146,8 +147,8 @@ gulp.task('download', function (done) {
                     console.log('\n', err, 'while downloading', data);
                 }
                 return false;
-            }, {compact: true, onProgress: function(id, total, completed) {
-                writeProgress(id, total, completed);
+            }, {compact: true, onProgress: function(total, completed) {
+                writeProgress('container', total, completed);
             }})(list);
         })
         .then(function() {
