@@ -1,5 +1,5 @@
 # node-door43-client
-A client library for interacting with the [Door43](https://door43.org) Catalog (eventually to be located at https://cdn.door43.org/v3/catalog.json).
+A client library for interacting with the [Door43](https://door43.org) Resource Catalog (eventually to be located at https://cdn.door43.org/v3/catalog.json).
 
 > This library is still under development
 

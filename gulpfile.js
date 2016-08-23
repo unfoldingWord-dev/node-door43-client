@@ -1,19 +1,32 @@
-var gulp = require('gulp');
-var mocha = require('gulp-mocha');
-var argv = require('yargs').argv;
-var rimraf = require('rimraf');
-var promiseUtils = require('./lib/utils/promises');
-var Door43Client = require('./');
-var readline = require('readline');
+const gulp = require('gulp');
+const mocha = require('gulp-mocha');
+const argv = require('yargs').argv;
+const rimraf = require('rimraf');
+const promiseUtils = require('./lib/utils/promises');
+const Door43Client = require('./');
+const readline = require('readline');
 
 const catalogUrl = 'https://api.unfoldingword.org/ts/txt/2/catalog.json';
 const indexPath = './out/library.sqlite';
 const resourceDir = './out/res';
 
-function writePercent(percent) {
-    readline.cursorTo(process.stdout, 0);
-    readline.clearLine(process.stdout, 0);
-    process.stdout.write(percent + '%');
+var lastProgressId;
+
+function writeProgress(id, total, completed) {
+    var percent = Math.round(10 * (100 * completed) / total) / 10;
+    if(id == lastProgressId) {
+        readline.cursorTo(process.stdout, 0);
+        readline.clearLine(process.stdout, 0);
+    } else {
+        lastProgressId = id;
+        process.stdout.write('\n');
+    }
+    var progressTitles = {
+        projects: 'Indexing Projects',
+        chunks: 'Indexing Chunks',
+        resources: 'Indexing Resources'
+    };
+    process.stdout.write(progressTitles[id] + ' ' + percent + '%');
 }
 
 gulp.task('clean', function (done) {
@@ -23,9 +36,8 @@ gulp.task('clean', function (done) {
 
 gulp.task('index', function (done) {
     var client = new Door43Client(indexPath, resourceDir);
-    client.updatePrimaryIndex(catalogUrl, function(total, completed) {
-        var percent = Math.round(10 * (100 * completed) / total) / 10;
-        writePercent(percent);
+    client.updatePrimaryIndex(catalogUrl, function(id, total, completed) {
+        writeProgress(id, total, completed);
     }).then(function() {
         console.log();
         return Promise.resolve();
@@ -57,9 +69,8 @@ gulp.task('download', function (done) {
                 return promiseUtils.chain(client.updateCatalogIndex, function (err, data) {
                     console.log(err);
                     return false;
-                }, {compact: true, onProgress: function(total, completed) {
-                    var percent = Math.round(10 * (100 * completed) / total) / 10;
-                    writePercent(percent);
+                }, {compact: true, onProgress: function(id, total, completed) {
+                    writeProgress(id, total, completed);
                 }})(list);
             })
             .then(function() {
@@ -135,9 +146,8 @@ gulp.task('download', function (done) {
                     console.log('\n', err, 'while downloading', data);
                 }
                 return false;
-            }, {compact: true, onProgress: function(total, completed) {
-                var percent = Math.round(10 * (100 * completed) / total) / 10;
-                writePercent(percent);
+            }, {compact: true, onProgress: function(id, total, completed) {
+                writeProgress(id, total, completed);
             }})(list);
         })
         .then(function() {
