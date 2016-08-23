@@ -32,55 +32,64 @@ describe('Client', () => {
         request.__setStatusCode = 200;
         request.__queueResponse = JSON.stringify([
             {
-                date_modified: "20160728",
-                lang_catalog: "https://api.unfoldingword.org/ts/txt/2/obs/languages.json?date_modified=20160728",
-                meta: [ ],
-                slug: "obs",
-                sort: "01"
+                date_modified: "20160620",
+                lang_catalog: "https://api.unfoldingword.org/ts/txt/2/1ch/languages.json?date_modified=20160620",
+                meta: [
+                    "bible-ot"
+                ],
+                slug: "1ch",
+                sort: "13"
             }
         ]);
         request.__queueResponse = JSON.stringify([
             {
                 language: {
-                    date_modified: "20150826",
+                    date_modified: "20160614",
                     direction: "ltr",
                     name: "English",
                     slug: "en"
                 },
                 project: {
-                    desc: "unfoldingWord | Open Bible Stories",
-                    meta: [ ],
-                    name: "Open Bible Stories"
+                    desc: "",
+                    meta: [
+                        "Bible: OT"
+                    ],
+                    name: "1 Chronicles",
+                    sort: "13"
                 },
-                res_catalog: "https://api.unfoldingword.org/ts/txt/2/obs/en/resources.json?date_modified=20150924"
+                res_catalog: "https://api.unfoldingword.org/ts/txt/2/1ch/en/resources.json?date_modified=20160614"
             }
         ]);
+        request.__queueResponse = '[{"chp": "01", "firstvs": "01"}, {"chp": "01", "firstvs": "05"}, {"chp": "01", "firstvs": "08"}]';
         request.__queueResponse = JSON.stringify([
             {
-                checking_questions: "https://api.unfoldingword.org/obs/txt/1/en/CQ-en.json?date_modified=20150924",
-                date_modified: "20150924",
-                name: "Open Bible Stories",
-                notes: "https://api.unfoldingword.org/obs/txt/1/en/tN-en.json?date_modified=20150924",
-                slug: "obs",
-                source: "https://api.unfoldingword.org/obs/txt/1/en/obs-en.json?date_modified=20150826",
+                checking_questions: "https://api.unfoldingword.org/ts/txt/2/1ch/en/questions.json?date_modified=20160504",
+                date_modified: "20160614",
+                name: "Unlocked Literal Bible",
+                notes: "https://api.unfoldingword.org/ts/txt/2/1ch/en/notes.json?date_modified=20160504",
+                slug: "ulb",
+                source: "https://api.unfoldingword.org/ts/txt/2/1ch/en/ulb/source.json?date_modified=20160614",
                 status: {
-                    checking_entity: "Distant Shores Media; Wycliffe Associates",
+                    checking_entity: "Wycliffe Associates",
                     checking_level: "3",
-                    comments: "Original source text.",
-                    contributors: "Distant Shores Media",
-                    publish_date: "2015-08-26",
+                    comments: "Original source text",
+                    contributors: "Wycliffe Associates",
+                    publish_date: "20160614",
                     source_text: "en",
-                    source_text_version: "4",
-                    version: "4"
+                    source_text_version: "5",
+                    version: "5"
                 },
-                terms: "https://api.unfoldingword.org/obs/txt/1/en/kt-en.json?date_modified=20150924",
-                tw_cat: "https://api.unfoldingword.org/obs/txt/1/en/tw_cat-en.json?date_modified=20150924"
+                terms: "https://api.unfoldingword.org/ts/txt/2/bible/en/terms.json?date_modified=20160504",
+                tw_cat: "https://api.unfoldingword.org/ts/txt/2/1ch/en/tw_cat.json?date_modified=20160504",
+                usfm: "https://api.unfoldingword.org/ulb/txt/1/ulb-en/13-1CH.usfm?date_modified=20160614"
             }
         ]);
         return client.updatePrimaryIndex(config.catalogUrl)
             .then(() => {
                 expect(library.addProject.mock.calls.length).toEqual(2); // project, words
                 expect(library.addSourceLanguage.mock.calls.length).toEqual(1);
+                expect(library.addVersification.mock.calls.length).toEqual(1); // versification
+                expect(library.addChunkMarker.mock.calls.length).toEqual(3); // chunks
                 expect(library.addResource.mock.calls.length).toEqual(4); // content, notes, questions, words
             })
             .catch(function(err) {

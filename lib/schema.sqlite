@@ -209,7 +209,7 @@ CREATE TABLE `versification_name` (
   `name` TEXT NOT NULL,
   FOREIGN KEY (source_language_id) REFERENCES `source_language` (`id`),
   FOREIGN KEY (versification_id) REFERENCES `versification` (`id`) ON DELETE CASCADE,
-  UNIQUE(`source_language_id`, `versification_id`, `name`)
+  UNIQUE(`source_language_id`, `versification_id`)
 );
 
 -- ---
@@ -237,8 +237,10 @@ CREATE TABLE `chunk_marker` (
   `chapter` TEXT NOT NULL,
   `verse` TEXT NOT NULL,
   `versification_id` INTEGER NOT NULL,
+  `project_id` INTEGER NOT NULL,
   UNIQUE (`versification_id`, `chapter`, `verse`),
-  FOREIGN KEY (versification_id) REFERENCES `versification` (`id`) ON DELETE CASCADE
+  FOREIGN KEY (versification_id) REFERENCES `versification` (`id`) ON DELETE CASCADE,
+  FOREIGN KEY (project_id) REFERENCES `project` (`id`) ON DELETE CASCADE
 );
 
 -- ---

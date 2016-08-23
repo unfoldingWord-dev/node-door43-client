@@ -30,6 +30,15 @@ describe('Library', () => {
         return alternate;
     }
 
+    /**
+     *
+     * @param setter
+     * @param getter
+     * @param insertObject
+     * @param setterExtraArgs
+     * @param getterExtraArgs
+     * @param cleanArgs
+     */
     function testInsert(setter, getter, insertObject, setterExtraArgs, getterExtraArgs, cleanArgs) {
         var object = _.clone(insertObject);
         setterExtraArgs = setterExtraArgs || [];
@@ -381,12 +390,133 @@ describe('Library', () => {
             testIncomplete('addCatalog', catalog);
         });
 
-        it('it should return null for a missing catalog', () => {
+        it('should return null for a missing catalog', () => {
             testMissing('getCatalog', ['missing-cat']);
         });
 
         it('should return multiple catalogs', () => {
             testMultiple('addCatalog', 'getCatalogs', catalog);
+        });
+    });
+
+    describe('Versification', () => {
+        var versification;
+        var versificationAlt;
+        var enLang;
+        var deLang;
+
+        beforeEach(() => {
+            setUpContext();
+
+            versification = {
+                slug: 'en-US',
+                name: 'American English'
+            };
+            versificationAlt = alter(versification, ['name']);
+            enLang = {
+                slug: 'en',
+                name: 'English',
+                direction: 'ltr'
+            };
+            deLang = {
+                slug: 'de',
+                name: 'Deutsch',
+                direction: 'ltr'
+            };
+            enLang.id = library.addSourceLanguage(enLang);
+            deLang.id = library.addSourceLanguage(deLang);
+        });
+
+        it('should add a versification to the database', () => {
+            testInsert('addVersification', 'getVersification', versification, [enLang.id], [enLang.slug]);
+        });
+
+        it('should update a versification in the database', () => {
+            testUpdate('addVersification', 'getVersification', versification, versificationAlt, [enLang.id], [enLang.slug])
+        });
+
+        it('should not add incomplete versification to the database', () => {
+            delete versification.name;
+            testIncomplete('addVersification', versification, [enLang.id]);
+        });
+
+        it('should return null for a missing versification', () => {
+            testMissing('getVersification', ['missing-lang', 'missing-ver']);
+        });
+
+        it('should return multiple versifications', () => {
+            testMultiple('addVersification', 'getVersifications', versification, [enLang.id], [enLang.slug]);
+        });
+    });
+
+    describe('ChunkMarker', () => {
+        var chunk;
+        var chunkAlt;
+        var versification;
+        var project;
+
+        beforeEach(() => {
+            setUpContext();
+
+            chunk = {
+                chapter: '01',
+                verse: '01'
+            };
+            chunkAlt = alter(chunk, ['verse']);
+            versification = {
+                slug: 'en-US',
+                name: 'American English'
+            };
+            project = {
+                slug: 'gen',
+                name: 'Genesis',
+                sort: 1
+            };
+            var langId = library.addSourceLanguage({
+                slug: 'en',
+                name: 'English',
+                direction: 'ltr'
+            });
+            project.id = library.addProject(project, langId);
+            versification.id = library.addVersification(versification, langId);
+
+            /**
+             * TRICKY: there is no sensible way to retrieve a single chunk marker
+             * so it's not part of the library but we add this utility just for testing
+             *
+             */
+            library.getters.getChunkMarker = function(projectSlug, versificationSlug) {
+                var chunks = library.getters.getChunkMarkers(projectSlug, versificationSlug);
+                if(chunks.length > 0) {
+                    return chunks[0];
+                }
+                return null;
+            }
+        });
+
+        it('should add a chunk marker to the database', () => {
+            testInsert('addChunkMarker', 'getChunkMarker', chunk, [project.id, versification.id],
+                [project.slug, versification.slug], ['versification_id', 'project_id']);
+        });
+
+        it('should not add incomplete chunk marker to the database', () => {
+            delete chunk.chapter;
+            testIncomplete('addChunkMarker', chunk, [project.id, versification.id]);
+        });
+
+        it('should return null for a missing chunk marker', () => {
+            testMissing('getChunkMarker', ['missing-ver', 'missing-proj']);
+        });
+
+        it('should return multiple chunk markers', () => {
+            let firstId = library.addChunkMarker(chunk, project.id, versification.id);
+            expect(firstId > 0).toBeTruthy();
+            let secondId = library.addChunkMarker(chunkAlt, project.id, versification.id);
+            expect(secondId > 0).toBeTruthy();
+
+            expect(secondId).not.toEqual(firstId);
+            let result = library.getters.getChunkMarkers(project.slug, versification.slug);
+            expect(result.length).toEqual(2);
         });
     });
 });

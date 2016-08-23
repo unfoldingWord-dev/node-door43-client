@@ -1,3 +1,10 @@
 'use strict';
 
-// TODO: begin writing tests for container module
+jest.unmock('../lib/container');
+
+describe('Container', () => {
+
+    it('should do stuff', () => {
+
+    });
+});
