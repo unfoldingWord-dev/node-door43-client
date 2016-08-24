@@ -25,7 +25,8 @@ function writeProgress(id, total, completed) {
         projects: 'Indexing Projects',
         chunks: 'Indexing Chunks',
         resources: 'Indexing Resources',
-        container: 'Downloading Containers'
+        container: 'Downloading Containers',
+        catalog: 'Indexing Catalogs'
     };
     process.stdout.write(progressTitles[id] + ' ' + percent + '%');
 }
@@ -37,6 +38,30 @@ gulp.task('clean', function (done) {
 
 gulp.task('index', function (done) {
     var client = new Door43Client(indexPath, resourceDir);
+
+    if(argv.catalogs) {
+        client.index.getCatalogs()
+            .then(function(catalogs) {
+                var list = [];
+                for(var catalog of catalogs) {
+                    list.push(catalog.slug);
+                }
+                return promiseUtils.chain(client.updateCatalogIndex, function (err, data) {
+                    console.log(err);
+                    return false;
+                }, {compact: true, onProgress: function(total, completed) {
+                    writeProgress('catalog', total, completed);
+                }})(list);
+            })
+            .then(function() {
+                // so gulp doesn't choke
+                console.log();
+                return Promise.resolve();
+            })
+            .then(done, done);
+        return;
+    }
+
     client.updatePrimaryIndex(catalogUrl, function(id, total, completed) {
         writeProgress(id, total, completed);
     }).then(function() {
@@ -59,29 +84,6 @@ gulp.task('download', function (done) {
             return client.index.getSourceLanguages();
         }
     };
-
-    if(argv.catalogs) {
-        client.index.getCatalogs()
-            .then(function(catalogs) {
-                var list = [];
-                for(var catalog of catalogs) {
-                    list.push(catalog.slug);
-                }
-                return promiseUtils.chain(client.updateCatalogIndex, function (err, data) {
-                    console.log(err);
-                    return false;
-                }, {compact: true, onProgress: function(id, total, completed) {
-                    writeProgress(id, total, completed);
-                }})(list);
-            })
-            .then(function() {
-                // so gulp doesn't choke
-                console.log();
-                return Promise.resolve();
-            })
-            .then(done, done);
-        return;
-    }
 
     getLanguages(argv.lang)
         .then(function(languages) {

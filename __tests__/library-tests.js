@@ -79,7 +79,8 @@ describe('Library', () => {
         // update
         setterExtraArgs.shift();
         setterExtraArgs.unshift(updateObject);
-        fun.apply(null, setterExtraArgs);
+        var updatedId = fun.apply(null, setterExtraArgs);
+        expect(updatedId).toEqual(id);
 
         getterExtraArgs.push(insertObject.slug);
         var result = library.getters[getter].apply(null, getterExtraArgs);
@@ -457,20 +458,20 @@ describe('Library', () => {
 
         beforeEach(() => {
             setUpContext();
-
+            project = {
+                slug: 'gen',
+                name: 'Genesis',
+                sort: 1
+            };
             chunk = {
                 chapter: '01',
-                verse: '01'
+                verse: '01',
+                project_slug: project.slug
             };
             chunkAlt = alter(chunk, ['verse']);
             versification = {
                 slug: 'en-US',
                 name: 'American English'
-            };
-            project = {
-                slug: 'gen',
-                name: 'Genesis',
-                sort: 1
             };
             var langId = library.addSourceLanguage({
                 slug: 'en',
