@@ -26,7 +26,8 @@ function writeProgress(id, total, completed) {
         chunks: 'Indexing Chunks',
         resources: 'Indexing Resources',
         container: 'Downloading Containers',
-        catalog: 'Indexing Catalogs'
+        catalog: 'Indexing Catalogs',
+        langnames: 'Indexing Target Languages'
     };
     process.stdout.write(progressTitles[id] + ' ' + percent + '%');
 }
@@ -44,14 +45,15 @@ gulp.task('index', function (done) {
             .then(function(catalogs) {
                 var list = [];
                 for(var catalog of catalogs) {
-                    list.push(catalog.slug);
+                    list.push({
+                        slug: catalog.slug,
+                        onProgress: writeProgress
+                    });
                 }
                 return promiseUtils.chain(client.updateCatalogIndex, function (err, data) {
                     console.log(err);
                     return false;
-                }, {compact: true, onProgress: function(total, completed) {
-                    writeProgress('catalog', total, completed);
-                }})(list);
+                })(list);
             })
             .then(function() {
                 // so gulp doesn't choke

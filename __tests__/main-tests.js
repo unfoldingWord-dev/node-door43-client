@@ -84,6 +84,12 @@ describe('Client', () => {
                 usfm: "https://api.unfoldingword.org/ulb/txt/1/ulb-en/13-1CH.usfm?date_modified=20160614"
             }
         ]);
+        library.__queueResponse = JSON.stringify({
+            name: 'American English',
+            slug: 'en-US',
+            id: 1
+        });
+
         return client.updatePrimaryIndex(config.catalogUrl)
             .then(() => {
                 expect(library.addProject.mock.calls.length).toEqual(2); // project, words
