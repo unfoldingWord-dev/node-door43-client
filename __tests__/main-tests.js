@@ -411,10 +411,14 @@ describe('Client', () => {
             ]
         };
 
-        return client.makeResourceContainer('en', 'obs', 'book', 'obs', JSON.stringify(data))
+        return client.legacy_tools.convertResource('en', 'obs', 'book', 'obs', JSON.stringify(data))
             .then(function() {
-                // TODO: test
-                expect(true).toBeTruthy();
+                let rc = require('../lib/container');
+                expect(rc.tools.makeSlug.mock.calls.length).toEqual(1);
+                expect(library.getters.getSourceLanguage.mock.calls.length).toEqual(1);
+                expect(library.getters.getProject.mock.calls.length).toEqual(1);
+                expect(library.getters.getResource.mock.calls.length).toEqual(1);
+                expect(rc.tools.convertResource.mock.calls.length).toEqual(1);
             });
     });
 });
