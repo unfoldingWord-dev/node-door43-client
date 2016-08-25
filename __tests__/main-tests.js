@@ -413,7 +413,7 @@ describe('Client', () => {
 
         return client.legacy_tools.convertResource('en', 'obs', 'book', 'obs', JSON.stringify(data))
             .then(function() {
-                let rc = require('resource-container');
+                let rc = require('door43-rc');
                 expect(rc.tools.makeSlug.mock.calls.length).toEqual(1);
                 expect(library.getters.getSourceLanguage.mock.calls.length).toEqual(1);
                 expect(library.getters.getProject.mock.calls.length).toEqual(1);
