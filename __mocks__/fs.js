@@ -1,6 +1,5 @@
 'use strict';
 
-var responses = [];
 let disk = {};
 
 /**
@@ -46,9 +45,6 @@ function readPath(parentDir, path) {
 }
 
 module.exports = {
-    set __queueResponse (data) {
-        responses.push(data);
-    },
     writeFileSync: jest.fn(writeFileSync),
     writeFile: jest.fn(function(path, contents, callback) {
         setTimeout(function() {
