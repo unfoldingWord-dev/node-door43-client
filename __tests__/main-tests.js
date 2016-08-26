@@ -566,4 +566,94 @@ describe('Update check', () => {
                 expect(projects.sort()).toEqual(expected.sort());
             });
     });
+
+    it('should display a list of available project updates within a single source language', () => {
+        let langSlug = 'en';
+        // downloaded containers
+        fs.writeFileSync(config.resDir + '1gen-container.ts', '');
+        fs.writeFileSync(config.resDir + '2ex-container.ts', '');
+        fs.writeFileSync(config.resDir + '3ex-container', '');
+        fs.writeFileSync(config.resDir + '4num-container.ts', '');
+        fs.writeFileSync(config.resDir + '5dut-container.ts', '');
+        // indexed projects
+        library.__queueResponse = [
+            {
+                slug: 'obs',
+                modified_at: 100
+            },
+            {
+                slug: 'lev',
+                modified_at: 0
+            },
+            {
+                slug: 'gen',
+                modified_at: 100
+            },
+            {
+                slug: 'ex',
+                modified_at: 0
+            },
+            {
+                slug: 'num',
+                modified_at: 1
+            },
+            {
+                slug: 'dut',
+                modified_at: 100
+            }
+        ];
+        rc.__queueResponse = {
+            package_version: '1.0',
+            type: 'book',
+            modified_at: 0,
+            content_mime_type: 'text/usfm',
+            project: {
+                slug: 'gen'
+            },
+            language: {
+                slug: 'es'
+            }
+        };
+        rc.__queueResponse = {
+            package_version: '1.0',
+            type: 'book',
+            modified_at: 100,
+            content_mime_type: 'text/usfm',
+            project: {
+                slug: 'ex'
+            },
+            language: {
+                slug: langSlug
+            }
+        };
+        rc.__queueResponse = {
+            package_version: '1.0',
+            type: 'book',
+            modified_at: 1,
+            content_mime_type: 'text/usfm',
+            project: {
+                slug: 'num'
+            },
+            language: {
+                slug: langSlug
+            }
+        };
+        rc.__queueResponse = {
+            package_version: '1.0',
+            type: 'book',
+            modified_at: 0,
+            content_mime_type: 'text/usfm',
+            project: {
+                slug: 'dut'
+            },
+            language: {
+                slug: langSlug
+            }
+        };
+        let expected = ['dut'];
+        return client.findUpdates.projects(langSlug)
+            .then(function(projects) {
+                expect(projects.sort()).toEqual(expected.sort());
+            });
+    });
 });
