@@ -417,9 +417,9 @@ describe('Client', () => {
             .then(function() {
                 let rc = require('door43-rc');
                 expect(rc.tools.makeSlug.mock.calls.length).toEqual(1);
-                expect(library.getters.getSourceLanguage.mock.calls.length).toEqual(1);
-                expect(library.getters.getProject.mock.calls.length).toEqual(1);
-                expect(library.getters.getResource.mock.calls.length).toEqual(1);
+                expect(library.public_getters.getSourceLanguage.mock.calls.length).toEqual(1);
+                expect(library.public_getters.getProject.mock.calls.length).toEqual(1);
+                expect(library.public_getters.getResource.mock.calls.length).toEqual(1);
                 expect(rc.tools.convertResource.mock.calls.length).toEqual(1);
             });
     });
@@ -446,10 +446,12 @@ describe('Update check', () => {
     });
 
     it('should display a list of available language updates', () => {
+        // downloaded containers
         fs.writeFileSync(config.resDir + '1en-container.ts', '');
         fs.writeFileSync(config.resDir + '2de-container.ts', '');
         fs.writeFileSync(config.resDir + 'de-container', '');
         fs.writeFileSync(config.resDir + '3ru-container.ts', '');
+        // indexed projects
         library.__queueResponse = [
             {
                 slug: 'fr',
@@ -472,6 +474,7 @@ describe('Update check', () => {
                 modified_at: 1
             }
         ];
+        // downloaded container info
         rc.__queueResponse = {
             package_version: '1.0',
             type: 'book',
@@ -507,10 +510,12 @@ describe('Update check', () => {
     });
 
     it('should display a list of available project updates', () => {
+        // downloaded containers
         fs.writeFileSync(config.resDir + '1gen-container.ts', '');
         fs.writeFileSync(config.resDir + '2ex-container.ts', '');
         fs.writeFileSync(config.resDir + 'ex-container', '');
         fs.writeFileSync(config.resDir + '3num-container.ts', '');
+        // indexed projects
         library.__queueResponse = [
             {
                 slug: 'obs',
@@ -533,6 +538,7 @@ describe('Update check', () => {
                 modified_at: 1
             }
         ];
+        // downloaded container info
         rc.__queueResponse = {
             package_version: '1.0',
             type: 'book',
@@ -602,6 +608,7 @@ describe('Update check', () => {
                 modified_at: 100
             }
         ];
+        // downloaded container info
         rc.__queueResponse = {
             package_version: '1.0',
             type: 'book',

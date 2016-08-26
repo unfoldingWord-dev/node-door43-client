@@ -51,13 +51,15 @@ describe('Library', () => {
         var fun = library[setter];
         setterExtraArgs.unshift(object);
         var id = fun.apply(null, setterExtraArgs);
-        expect(id > 0).toBeTruthy();
+        expect(id).toBeTruthy();
 
         getterExtraArgs.push(object.slug);
-        var result = library.getters[getter].apply(null, getterExtraArgs);
+        var result = library.public_getters[getter].apply(null, getterExtraArgs);
         expect(result).not.toEqual(null);
-        expect(result.id).toEqual(id);
-        delete result.id;
+        if(result.id) {
+            expect(result.id).toEqual(id);
+            delete result.id;
+        }
 
         // clean objects before comparison
         _.each(cleanArgs, function(value, index) {
@@ -77,7 +79,7 @@ describe('Library', () => {
         var fun = library[setter];
         setterExtraArgs.unshift(insertObject);
         var id = fun.apply(null, setterExtraArgs);
-        expect(id > 0).toBeTruthy();
+        expect(id).toBeTruthy();
 
         // update
         setterExtraArgs.shift();
@@ -86,9 +88,11 @@ describe('Library', () => {
         expect(updatedId).toEqual(id);
 
         getterExtraArgs.push(insertObject.slug);
-        var result = library.getters[getter].apply(null, getterExtraArgs);
-        expect(result.id).toEqual(id);
-        delete result.id;
+        var result = library.public_getters[getter].apply(null, getterExtraArgs);
+        if(result.id) {
+            expect(result.id).toEqual(id);
+            delete result.id;
+        }
 
         // clean objects before comparison
         _.each(cleanArgs, function(value, index) {
@@ -113,7 +117,7 @@ describe('Library', () => {
         var error = null;
         try {
             var id = fun.apply(null, setterExtraArgs);
-            expect(id).toEqual(-1);
+            expect(id).not.toBeTruthy();
         } catch (e) {
             error = e;
         }
@@ -121,7 +125,7 @@ describe('Library', () => {
     }
 
     function testMissing(getter, getterArgs) {
-        var result = library.getters[getter].apply(null, getterArgs);
+        var result = library.public_getters[getter].apply(null, getterArgs);
         expect(result).toEqual(null);
     }
 
@@ -140,12 +144,14 @@ describe('Library', () => {
         setterExtraArgs.shift();
         setterExtraArgs.unshift(objectAlt);
         var secondId = fun.apply(null, setterExtraArgs);
-        expect(secondId > 0).toBeTruthy();
+        expect(secondId).toBeTruthy();
 
-        expect(secondId).not.toEqual(firstId);
+        if(typeof secondId !== 'boolean') {
+            expect(secondId).not.toEqual(firstId);
+        }
 
-        var result = library.getters[getterMultiple].apply(null, getterArgs);
-        expect(result.length > 1).toBeTruthy();
+        var result = library.public_getters[getterMultiple].apply(null, getterArgs);
+        expect(result.length).toBeTruthy();
     }
 
     describe('SourceLanguage', () => {
@@ -489,8 +495,8 @@ describe('Library', () => {
              * so it's not part of the library but we add this utility just for testing
              *
              */
-            library.getters.getChunkMarker = function(projectSlug, versificationSlug) {
-                var chunks = library.getters.getChunkMarkers(projectSlug, versificationSlug);
+            library.public_getters.getChunkMarker = function(projectSlug, versificationSlug) {
+                var chunks = library.public_getters.getChunkMarkers(projectSlug, versificationSlug);
                 if(chunks.length > 0) {
                     return chunks[0];
                 }
@@ -519,7 +525,7 @@ describe('Library', () => {
             expect(secondId > 0).toBeTruthy();
 
             expect(secondId).not.toEqual(firstId);
-            let result = library.getters.getChunkMarkers(project.slug, versification.slug);
+            let result = library.public_getters.getChunkMarkers(project.slug, versification.slug);
             expect(result.length).toEqual(2);
         });
     });
