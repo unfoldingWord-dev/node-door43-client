@@ -5,7 +5,13 @@ const spec = {
     file_ext: 'ts'
 };
 
+let responses = [];
+
 module.exports = {
+    set __queueResponse (response) {
+        responses.push(response);
+    },
+
     load: jest.fn(function(container_directory, opts) {
         return Promise.resolve({});
     }),
@@ -35,6 +41,9 @@ module.exports = {
         typeToMime: jest.fn(function(container_type) {
             return 'application/ts+' + container_type;
         }),
-        spec: spec
+        spec: spec,
+        inspect: jest.fn(function(path) {
+            return Promise.resolve(responses.shift());
+        })
     }
 };

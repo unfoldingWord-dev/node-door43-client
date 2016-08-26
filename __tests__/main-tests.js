@@ -7,10 +7,12 @@ jest.unmock('../lib/utils/promises');
 jest.unmock('../lib/utils/files');
 jest.unmock('../lib/main');
 jest.unmock('yamljs');
+jest.unmock('lodash');
 
 var rimraf = require('rimraf');
 
 const config = {
+    schemaPath: './lib/schema.sqlite',
     dbPath: './out/test.client.sqlite',
     resDir: './out/test.res.client/',
     catalogUrl: 'https://api.unfoldingword.org/ts/txt/2/catalog.json'
@@ -419,6 +421,151 @@ describe('Client', () => {
                 expect(library.getters.getProject.mock.calls.length).toEqual(1);
                 expect(library.getters.getResource.mock.calls.length).toEqual(1);
                 expect(rc.tools.convertResource.mock.calls.length).toEqual(1);
+            });
+    });
+});
+
+describe('Update check', () => {
+
+    var client, request, library, fs, rc;
+
+    beforeEach(() => {
+        jest.mock('fs');
+
+        fs = require('fs');
+        rc = require('door43-rc');
+        var Client = require('../');
+
+        fs.writeFileSync(config.schemaPath, '');
+        fs.writeFileSync(config.dbPath, '');
+
+        client = new Client(config.dbPath, config.resDir);
+        var Library = require('../lib/library');
+        library = new Library(null);
+        request = require('../lib/request');
+    });
+
+    it('should display a list of available language updates', () => {
+        fs.writeFileSync(config.resDir + '1en-container.ts', '');
+        fs.writeFileSync(config.resDir + '2de-container.ts', '');
+        fs.writeFileSync(config.resDir + 'de-container', '');
+        fs.writeFileSync(config.resDir + '3ru-container.ts', '');
+        library.__queueResponse = [
+            {
+                slug: 'fr',
+                modified_at: 100
+            },
+            {
+                slug: 'es',
+                modified_at: 0
+            },
+            {
+                slug: 'en',
+                modified_at: 100
+            },
+            {
+                slug: 'de',
+                modified_at: 0
+            },
+            {
+                slug: 'ru',
+                modified_at: 1
+            }
+        ];
+        rc.__queueResponse = {
+            package_version: '1.0',
+            type: 'book',
+            modified_at: 0,
+            content_mime_type: 'text/usfm',
+            language: {
+                slug: 'en'
+            }
+        };
+        rc.__queueResponse = {
+            package_version: '1.0',
+            type: 'book',
+            modified_at: 100,
+            content_mime_type: 'text/usfm',
+            language: {
+                slug: 'de'
+            }
+        };
+        rc.__queueResponse = {
+            package_version: '1.0',
+            type: 'book',
+            modified_at: 1,
+            content_mime_type: 'text/usfm',
+            language: {
+                slug: 'ru'
+            }
+        };
+        // TODO: fr and es have not been downloaded at all
+        let expected = ['en', 'es', 'fr'];
+        return client.findUpdates.sourceLanguages()
+            .then(function(languages) {
+                expect(languages.sort()).toEqual(expected.sort());
+            });
+    });
+
+    it('should display a list of available project updates', () => {
+        fs.writeFileSync(config.resDir + '1gen-container.ts', '');
+        fs.writeFileSync(config.resDir + '2ex-container.ts', '');
+        fs.writeFileSync(config.resDir + 'ex-container', '');
+        fs.writeFileSync(config.resDir + '3num-container.ts', '');
+        library.__queueResponse = [
+            {
+                slug: 'obs',
+                modified_at: 100
+            },
+            {
+                slug: 'lev',
+                modified_at: 0
+            },
+            {
+                slug: 'gen',
+                modified_at: 100
+            },
+            {
+                slug: 'ex',
+                modified_at: 0
+            },
+            {
+                slug: 'num',
+                modified_at: 1
+            }
+        ];
+        rc.__queueResponse = {
+            package_version: '1.0',
+            type: 'book',
+            modified_at: 0,
+            content_mime_type: 'text/usfm',
+            project: {
+                slug: 'gen'
+            }
+        };
+        rc.__queueResponse = {
+            package_version: '1.0',
+            type: 'book',
+            modified_at: 100,
+            content_mime_type: 'text/usfm',
+            project: {
+                slug: 'ex'
+            }
+        };
+        rc.__queueResponse = {
+            package_version: '1.0',
+            type: 'book',
+            modified_at: 1,
+            content_mime_type: 'text/usfm',
+            project: {
+                slug: 'num'
+            }
+        };
+        // TODO: obs and lev has not been downloaded at all
+        let expected = ['gen', 'obs', 'lev'];
+        return client.findUpdates.projects()
+            .then(function(projects) {
+                expect(projects.sort()).toEqual(expected.sort());
             });
     });
 });
