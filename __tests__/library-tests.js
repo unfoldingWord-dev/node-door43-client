@@ -71,6 +71,16 @@ describe('Library', () => {
         expect(result).toEqual(object);
     }
 
+    /**
+     *
+     * @param setter
+     * @param getter
+     * @param insertObject
+     * @param updateObject
+     * @param setterExtraArgs
+     * @param getterExtraArgs
+     * @param cleanArgs
+     */
     function testUpdate(setter, getter, insertObject, updateObject, setterExtraArgs, getterExtraArgs, cleanArgs) {
         setterExtraArgs = setterExtraArgs || [];
         getterExtraArgs = getterExtraArgs || [];
@@ -226,6 +236,44 @@ describe('Library', () => {
 
         it('should return multiple target languages', () => {
             testMultiple('addTargetLanguage', 'getTargetLanguages', language);
+        });
+    });
+
+    describe('Temporary TargetLanguage', () => {
+        var language;
+        var languageAlt;
+
+        beforeEach(() => {
+            setUpContext();
+            language = {
+                slug: 'en',
+                name: 'English',
+                direction: 'ltr',
+                region: 'United States'
+            };
+            languageAlt = alter(language, ['name', 'region']);
+        });
+
+        it('should add a temporary target language to the database', () => {
+            testInsert('addTempTargetLanguage', 'getTargetLanguage', language, null, null, ['anglicized_name', 'is_gateway_language']);
+        });
+
+        it('should update a temporary target language in the database', () => {
+            testUpdate('addTempTargetLanguage', 'getTargetLanguage', language, languageAlt, null, null, ['anglicized_name', 'is_gateway_language']);
+        });
+
+        it('should not add incomplete temporary target language to the database', () => {
+            delete language.name;
+            testIncomplete('addTempTargetLanguage', language);
+        });
+
+        // tested in target language tests
+        // it('it should return null for a missing temporary target language', () => {
+        //     testMissing('getTargetLanguage', ['missing-lang']);
+        // });
+
+        it('should return multiple temporary target languages', () => {
+            testMultiple('addTempTargetLanguage', 'getTargetLanguages', language);
         });
     });
 
