@@ -248,18 +248,20 @@ describe('Library', () => {
             language = {
                 slug: 'en',
                 name: 'English',
+                anglicized_name: 'American English',
                 direction: 'ltr',
-                region: 'United States'
+                region: 'United States',
+                is_gateway_language: 0
             };
             languageAlt = alter(language, ['name', 'region']);
         });
 
         it('should add a temporary target language to the database', () => {
-            testInsert('addTempTargetLanguage', 'getTargetLanguage', language, null, null, ['anglicized_name', 'is_gateway_language']);
+            testInsert('addTempTargetLanguage', 'getTargetLanguage', language);
         });
 
         it('should update a temporary target language in the database', () => {
-            testUpdate('addTempTargetLanguage', 'getTargetLanguage', language, languageAlt, null, null, ['anglicized_name', 'is_gateway_language']);
+            testUpdate('addTempTargetLanguage', 'getTargetLanguage', language, languageAlt);
         });
 
         it('should not add incomplete temporary target language to the database', () => {
