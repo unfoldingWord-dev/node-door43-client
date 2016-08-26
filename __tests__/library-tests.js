@@ -2,7 +2,6 @@
 
 jest.unmock('lodash');
 jest.unmock('sql.js');
-jest.unmock('fs');
 jest.unmock('../lib/library');
 
 const config = {
@@ -18,6 +17,10 @@ describe('Library', () => {
 
     function setUpContext() {
         var Library = require('../lib/library');
+        var realfs = require.requireActual('fs');
+        var schema = realfs.readFileSync(config.schemaPath);
+        var fs = require('fs');
+        fs.writeFileSync(config.schemaPath, schema);
         var SqliteHelper = require('../lib/sqlite-helper');
         library = new Library(new SqliteHelper(config.schemaPath, config.dbPath));
     }
