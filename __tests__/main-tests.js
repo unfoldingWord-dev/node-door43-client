@@ -499,8 +499,7 @@ describe('Update check', () => {
                 slug: 'ru'
             }
         };
-        // TODO: fr and es have not been downloaded at all
-        let expected = ['en', 'es', 'fr'];
+        let expected = ['en'];
         return client.findUpdates.sourceLanguages()
             .then(function(languages) {
                 expect(languages.sort()).toEqual(expected.sort());
@@ -561,8 +560,7 @@ describe('Update check', () => {
                 slug: 'num'
             }
         };
-        // TODO: obs and lev has not been downloaded at all
-        let expected = ['gen', 'obs', 'lev'];
+        let expected = ['gen'];
         return client.findUpdates.projects()
             .then(function(projects) {
                 expect(projects.sort()).toEqual(expected.sort());
