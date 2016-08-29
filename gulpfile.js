@@ -28,7 +28,8 @@ function writeProgress(id, total, completed) {
         container: 'Downloading Containers',
         catalog: 'Indexing Catalogs',
         langnames: 'Indexing Target Languages',
-        'temp-langnames': 'Indexing Temporary Target Languages'
+        'temp-langnames': 'Indexing Temporary Target Languages',
+        'approved-temp-langnames': 'Indexing Approved Temporary Target Languages'
     };
     process.stdout.write(progressTitles[id] + ' ' + percent + '%');
 }
