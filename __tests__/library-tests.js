@@ -279,6 +279,41 @@ describe('Library', () => {
         });
     });
 
+    describe('Approved Temporary TargetLanguage', () => {
+        var language;
+        var tempLanguage;
+
+        beforeEach(() => {
+            setUpContext();
+            language = {
+                slug: 'en',
+                name: 'English',
+                anglicized_name: 'American English',
+                direction: 'ltr',
+                region: 'United States',
+                is_gateway_language: 0
+            };
+            tempLanguage = {
+                slug: 'temp-en',
+                name: 'Temp English',
+                anglicized_name: 'American English',
+                direction: 'ltr',
+                region: 'United States',
+                is_gateway_language: 0
+            };
+            if(!library.addTargetLanguage(language)) throw new Error('Failed to setup target language');
+            if(!library.addTempTargetLanguage(tempLanguage)) throw new Error('Failed to setup temp target language');
+        });
+
+        it('should assign the approved target language to a temporary target language', () => {
+            var success = library.setApprovedTargetLanguage(tempLanguage.slug, language.slug);
+            expect(success).toBeTruthy();
+            var result = library.public_getters.getApprovedTargetLanguage(tempLanguage.slug);
+            delete result.id;
+            expect(result).toEqual(language);
+        });
+    });
+
     describe('Projects', () => {
         var source_language;
         var project;
@@ -467,7 +502,6 @@ describe('Library', () => {
 
         beforeEach(() => {
             setUpContext();
-
             versification = {
                 slug: 'en-US',
                 name: 'American English'

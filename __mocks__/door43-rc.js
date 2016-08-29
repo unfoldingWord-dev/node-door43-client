@@ -13,13 +13,13 @@ module.exports = {
     },
 
     load: jest.fn(function(container_directory, opts) {
-        return Promise.resolve({});
+        return Promise.resolve(responses.shift());
     }),
     make: jest.fn(function(container_directory, opts) {
-        return Promise.resolve({});
+        return Promise.resolve(responses.shift());
     }),
     open: jest.fn(function(container_archive, container_directory, opts) {
-        return Promise.resolve({});
+        return Promise.resolve(responses.shift());
     }),
     close: jest.fn(function(container_directory, opts) {
         return Promise.resolve(container_directory + spec.file_ext);

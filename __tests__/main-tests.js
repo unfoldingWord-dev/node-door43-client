@@ -314,6 +314,7 @@ describe('Client', () => {
     });
 
     it('should build a resource container', () => {
+        // TODO: this is deprecated and should be moved to the rc module.
         var fs = require('fs');
 
         library.__queueResponse = {
