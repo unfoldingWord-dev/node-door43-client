@@ -613,4 +613,49 @@ describe('Library', () => {
             expect(result.length).toEqual(2);
         });
     });
+
+    describe('Questionnaire', () => {
+        var questionnaire;
+        var questionnaireAlt;
+
+        beforeEach(() => {
+            setUpContext();
+            questionnaire = {
+                language_slug: 'en',
+                language_name: 'English',
+                language_direction: 'ltr',
+                td_id: 1
+            };
+            questionnaireAlt = alter(questionnaire, ['language_slug', 'language_name']);
+            questionnaireAlt.td_id = 2;
+        });
+
+        it('should add a questionnaire to the database', () => {
+            testInsert('addResource', 'getResource', resource,
+                [project.id], [source_language.slug, project.slug],
+                ['id']);
+        });
+
+        it('should update a questionnaire in the database', () => {
+            testUpdate('addResource', 'getResource', resource, resourceAlt,
+                [source_language.id, project.id], [source_language.slug, project.slug],
+                ['id']);
+        });
+
+        it('should not add incomplete questionnaire to the database', () => {
+            delete resource.name;
+            testIncomplete('addResource', resource, [source_language.id, project.id]);
+        });
+
+        it('it should return null for a missing questionnaire', () => {
+            testMissing('getResource', [source_language.slug, project.slug, 'missing-res']);
+            testMissing('getResource', [source_language.slug, 'missing-proj', 'missing-res']);
+            testMissing('getResource', ['missing-lang', 'missing-proj', 'missing-res']);
+        });
+
+        it('should return multiple questionnaires', () => {
+            testMultiple('addResource', 'getResources', resource,
+                [project.id], [source_language.slug, project.slug]);
+        });
+    });
 });
