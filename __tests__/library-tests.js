@@ -626,36 +626,49 @@ describe('Library', () => {
                 language_direction: 'ltr',
                 td_id: 1
             };
-            questionnaireAlt = alter(questionnaire, ['language_slug', 'language_name']);
+            questionnaireAlt = alter(questionnaire, ['language_name']);
             questionnaireAlt.td_id = 2;
         });
 
         it('should add a questionnaire to the database', () => {
-            testInsert('addResource', 'getResource', resource,
-                [project.id], [source_language.slug, project.slug],
-                ['id']);
+            var id = library.addQuestionnaire(questionnaire);
+            expect(id).toBeTruthy();
+            var questionnaires = library.public_getters.getQuestionnaires();
+            expect(questionnaires.length).toEqual(1);
+            delete questionnaires[0].id;
+            expect(questionnaires[0]).toEqual(questionnaire);
         });
 
         it('should update a questionnaire in the database', () => {
-            testUpdate('addResource', 'getResource', resource, resourceAlt,
-                [source_language.id, project.id], [source_language.slug, project.slug],
-                ['id']);
+            var id = library.addQuestionnaire(questionnaire);
+            expect(id).toBeTruthy();
+            questionnaireAlt.td_id = questionnaire.td_id;
+            var updatedId = library.addQuestionnaire(questionnaireAlt);
+            expect(updatedId).toEqual(id);
+            var questionnaires = library.public_getters.getQuestionnaires();
+            expect(questionnaires.length).toEqual(1);
+            expect(questionnaires[0].id).toEqual(id);
+            delete questionnaires[0].id;
+            expect(questionnaires[0]).toEqual(questionnaireAlt);
         });
 
         it('should not add incomplete questionnaire to the database', () => {
-            delete resource.name;
-            testIncomplete('addResource', resource, [source_language.id, project.id]);
-        });
-
-        it('it should return null for a missing questionnaire', () => {
-            testMissing('getResource', [source_language.slug, project.slug, 'missing-res']);
-            testMissing('getResource', [source_language.slug, 'missing-proj', 'missing-res']);
-            testMissing('getResource', ['missing-lang', 'missing-proj', 'missing-res']);
+            delete questionnaire.language_slug;
+            var error = null;
+            try {
+                var id = library.addQuestionnaire(questionnaire);
+                expect(id).not.toBeTruthy();
+            } catch (e) {
+                error = e;
+            }
+            expect(error).not.toEqual(null);
         });
 
         it('should return multiple questionnaires', () => {
-            testMultiple('addResource', 'getResources', resource,
-                [project.id], [source_language.slug, project.slug]);
+            library.addQuestionnaire(questionnaire);
+            library.addQuestionnaire(questionnaireAlt);
+            var result = library.public_getters.getQuestionnaires();
+            expect(result.length).toEqual(2);
         });
     });
 });
