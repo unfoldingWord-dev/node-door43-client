@@ -224,7 +224,7 @@ describe('Client', () => {
         };
 
 
-        return client.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
+        return client.legacy_tools.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 expect(request.download.mock.calls.length).toEqual(1);
             })
@@ -237,7 +237,7 @@ describe('Client', () => {
     it('should not download a missing resource container', () => {
         library.__queueResponse = null;
 
-        return client.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
+        return client.legacy_tools.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 throw Error();
             })
@@ -261,7 +261,7 @@ describe('Client', () => {
             ]
         };
 
-        return client.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
+        return client.legacy_tools.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 throw Error();
             })
@@ -278,7 +278,7 @@ describe('Client', () => {
             formats: []
         };
 
-        return client.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
+        return client.legacy_tools.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 throw Error();
             })
@@ -303,7 +303,7 @@ describe('Client', () => {
         };
         request.__setStatusCode = 400;
 
-        return client.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
+        return client.legacy_tools.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 throw Error();
             })

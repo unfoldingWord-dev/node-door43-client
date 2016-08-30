@@ -22,7 +22,7 @@ module.exports = {
         return Promise.resolve(responses.shift());
     }),
     close: jest.fn(function(container_directory, opts) {
-        return Promise.resolve(container_directory + spec.file_ext);
+        return Promise.resolve(container_directory + '.' +  spec.file_ext);
     }),
     tools: {
         convertResource: jest.fn(function(data, dir, opts) {

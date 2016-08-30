@@ -164,4 +164,11 @@ gulp.task('download', function (done) {
         })
         .then(done, done);
 });
+gulp.task('list', function(done) {
+    var client = new Door43Client(indexPath, resourceDir);
+    client.listResourceContainers()
+        .then(function(list) {
+            console.log(list);
+        });
+});
 gulp.task('default', ['test']);
