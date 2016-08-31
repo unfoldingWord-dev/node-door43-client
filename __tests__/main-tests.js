@@ -432,7 +432,7 @@ describe('Client', () => {
 
         return client.legacy_tools.convertResource('en', 'obs', 'book', 'obs', JSON.stringify(data))
             .then(function() {
-                let rc = require('door43-rc');
+                let rc = require('resource-container');
                 expect(rc.tools.makeSlug.mock.calls.length).toEqual(1);
                 expect(library.public_getters.getSourceLanguage.mock.calls.length).toEqual(1);
                 expect(library.public_getters.getProject.mock.calls.length).toEqual(1);
@@ -450,7 +450,7 @@ describe('Update check', () => {
         jest.mock('fs');
 
         fs = require('fs');
-        rc = require('door43-rc');
+        rc = require('resource-container');
         var Client = require('../');
 
         fs.writeFileSync(config.schemaPath, '');
