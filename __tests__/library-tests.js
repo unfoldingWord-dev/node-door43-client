@@ -671,4 +671,76 @@ describe('Library', () => {
             expect(result.length).toEqual(2);
         });
     });
+
+    describe('Question', () => {
+        var question;
+        var questionAlt;
+        var questionnaireId;
+
+        beforeEach(() => {
+            setUpContext();
+            let questionnaire = {
+                language_slug: 'en',
+                language_name: 'English',
+                language_direction: 'ltr',
+                td_id: 1
+            };
+            questionnaireId = library.addQuestionnaire(questionnaire);
+            expect(questionnaireId).toBeTruthy();
+            question = {
+                text: 'This is a question',
+                help: 'Give me an answer',
+                is_required: 1,
+                input_type: 'string',
+                sort: 1,
+                depends_on: 0,
+                td_id: 5
+            };
+            questionAlt = alter(question, ['text']);
+            questionAlt.td_id = 6;
+        });
+
+        it('should add a question to the database', () => {
+            var id = library.addQuestion(question, questionnaireId);
+            expect(id).toBeTruthy();
+            var questions = library.public_getters.getQuestions(questionnaireId);
+            expect(questions.length).toEqual(1);
+            delete questions[0].id;
+            delete questions[0].questionnaire_id;
+            expect(questions[0]).toEqual(question);
+        });
+
+        it('should update a question in the database', () => {
+            var id = library.addQuestion(question, questionnaireId);
+            expect(id).toBeTruthy();
+            questionAlt.td_id = question.td_id;
+            var updatedId = library.addQuestion(questionAlt, questionnaireId);
+            expect(updatedId).toEqual(id);
+            var questions = library.public_getters.getQuestions(questionnaireId);
+            expect(questions.length).toEqual(1);
+            expect(questions[0].id).toEqual(id);
+            delete questions[0].id;
+            delete questions[0].questionnaire_id;
+            expect(questions[0]).toEqual(questionAlt);
+        });
+
+        it('should not add incomplete question to the database', () => {
+            delete question.text;
+            var error = null;
+            try {
+                var id = library.addQuestion(question, questionnaireId);
+                expect(id).not.toBeTruthy();
+            } catch (e) {
+                error = e;
+            }
+            expect(error).not.toEqual(null);
+        });
+
+        it('should return multiple questions', () => {
+            library.addQuestion(question, questionnaireId);
+            library.addQuestion(questionAlt, questionnaireId);
+            var result = library.public_getters.getQuestions(questionnaireId);
+            expect(result.length).toEqual(2);
+        });
+    });
 });

@@ -29,9 +29,10 @@ function writeProgress(id, total, completed) {
         catalog: 'Indexing Catalogs',
         langnames: 'Indexing Target Languages',
         'temp-langnames': 'Indexing Temporary Target Languages',
-        'approved-temp-langnames': 'Indexing Approved Temporary Target Languages'
+        'approved-temp-langnames': 'Indexing Approved Temporary Target Languages',
+        'new-language-questions': 'Indexing Questionnaire'
     };
-    process.stdout.write(progressTitles[id] + ' ' + percent + '%');
+    process.stdout.write((progressTitles[id] || id) + ' ' + percent + '%');
 }
 
 gulp.task('clean', function (done) {

@@ -31,6 +31,22 @@ describe('Client', () => {
         request = require('../lib/request');
     });
 
+    it('should index the questionnaires', () => {
+        // TODO: write tests for indexing
+    });
+
+    it('should index the target languages', () => {
+        // TODO: write tests for indexing
+    });
+
+    it('should index the temporary target languages', () => {
+        // TODO: write tests for indexing
+    });
+
+    it('should index the approved temporary target languages', () => {
+        // TODO: write tests for indexing
+    });
+
     it('should index the Door43 catalog', () => {
         request.__setStatusCode = 200;
         request.__queueResponse = JSON.stringify([
