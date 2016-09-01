@@ -416,7 +416,7 @@ describe('Library', () => {
                     version: '3.0'
                 },
                 formats: [{
-                    package_version: '1.0',
+                    package_version: 1,
                     mime_type: 'application/ts+book',
                     modified_at: 20151222120130,
                     url: 'https://api.unfoldingword.org/ts/txt/2/gen/en/ulb/source.json'
