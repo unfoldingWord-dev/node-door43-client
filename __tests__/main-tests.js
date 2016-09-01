@@ -8,11 +8,13 @@ jest.unmock('../lib/utils/files');
 jest.unmock('../lib/main');
 jest.unmock('yamljs');
 jest.unmock('lodash');
+jest.unmock('path');
 
-var rimraf = require('rimraf');
+const path = require('path');
+const rimraf = require('rimraf');
 
 const config = {
-    schemaPath: './lib/schema.sqlite',
+    schemaPath: path.normalize(path.join(__dirname, '../lib/schema.sqlite')),
     dbPath: './out/test.client.sqlite',
     resDir: './out/test.res.client/',
     catalogUrl: 'https://api.unfoldingword.org/ts/txt/2/catalog.json'
