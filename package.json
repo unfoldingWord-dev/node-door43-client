@@ -1,6 +1,6 @@
 {
   "name": "door43-client",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "description": "A client library for interacting with the Door43 Resource Catalog.",
   "main": "./lib/main.js",
   "scripts": {
