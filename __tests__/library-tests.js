@@ -387,122 +387,160 @@ describe('Library', () => {
                 [source_language_en.id], [source_language_en.slug]);
         });
 
-        it('should return project categories in Deutsch', () => {
+        it('should return project categories in a single language', () => {
             // projects with no category
-            var project_top = _.clone(project);
-            project_top.slug = 'top-gen';
-            delete project_top.categories;
-            library.addProject(project_top, source_language_de.id);
-            library.addProject(project_top, source_language_en.id);
-
-            // german project with category
-            var project_de = _.clone(project);
-            project_de.categories = [{
-                name: 'German Old Testament',
-                slug: 'bible-ot'
+            var project1 = _.clone(project);
+            project1.slug = 'proj-1';
+            delete project1.categories;
+            var project2 = _.clone(project);
+            project2.slug = 'proj-2';
+            delete project2.categories;
+            // projects with category
+            var project3 = _.clone(project);
+            project3.slug = 'proj-3';
+            project3.categories = [{
+                name: 'First Cat',
+                slug: 'first-cat'
             }];
-            project_de.id = library.addProject(project_de, source_language_de.id);
-            // english project with category
-            project.id = library.addProject(project, source_language_en.id);
+            var project4 = _.clone(project);
+            project4.slug = 'proj-4';
+            project4.categories = [{
+                name: 'Second Cat',
+                slug: 'second-cat'
+            }];
 
-            // TODO: test with translate mode
-            var result = library.public_getters.getProjectCategories(0, source_language_de.slug, null);
-            expect(result.length).toEqual(2);
-            result.forEach(function(item) {
+            library.addProject(project1, source_language_fr.id);
+            library.addProject(project1, source_language_de.id);
+            library.addProject(project1, source_language_en.id);
+
+            library.addProject(project2, source_language_fr.id);
+            library.addProject(project2, source_language_de.id);
+            library.addProject(project2, source_language_en.id);
+
+            library.addProject(project3, source_language_fr.id);
+            library.addProject(project3, source_language_de.id);
+            library.addProject(project3, source_language_en.id);
+
+            library.addProject(project4, source_language_fr.id);
+            library.addProject(project4, source_language_de.id);
+            library.addProject(project4, source_language_en.id);
+
+            // TODO: test these getters with translate mode
+
+            // de
+            var deResult = library.public_getters.getProjectCategories(0, source_language_de.slug, null);
+            expect(deResult.length).toEqual(4);
+            deResult.forEach(function(item) {
                 expect(item.source_language_slug).toEqual(source_language_de.slug);
             });
-        });
 
-        it('should return project categories in English', () => {
-            // projects with no category
-            var project_top = _.clone(project);
-            project_top.slug = 'top-gen';
-            delete project_top.categories;
-            library.addProject(project_top, source_language_de.id);
-            library.addProject(project_top, source_language_en.id);
+            // fr
+            var frResult = library.public_getters.getProjectCategories(0, source_language_fr.slug, null);
+            expect(frResult.length).toEqual(4);
+            frResult.forEach(function(item) {
+                expect(item.source_language_slug).toEqual(source_language_fr.slug);
+            });
 
-            // german project with category
-            var project_de = _.clone(project);
-            project_de.categories = [{
-                name: 'German Old Testament',
-                slug: 'bible-ot'
-            }];
-            project_de.id = library.addProject(project_de, source_language_de.id);
-            // english project with category
-            project.id = library.addProject(project, source_language_en.id);
+            // en
+            var enResult = library.public_getters.getProjectCategories(0, source_language_en.slug, null);
+            expect(enResult.length).toEqual(4);
+            enResult.forEach(function(item) {
+                expect(item.source_language_slug).toEqual(source_language_en.slug);
+            });
 
-            // TODO: test with translate mode
-            var result = library.public_getters.getProjectCategories(0, source_language_en.slug, null);
-            expect(result.length).toEqual(2);
-            result.forEach(function(item) {
+            // default (en)
+            var missingLangId = 'missing';
+            var defaultResult = library.public_getters.getProjectCategories(0, missingLangId, null);
+            expect(defaultResult.length).toEqual(4);
+            defaultResult.forEach(function(item) {
                 expect(item.source_language_slug).toEqual(source_language_en.slug);
             });
         });
 
-        it('should return project categories in English by default', () => {
+        it('should return one project categories in mixed languages', () => {
             // projects with no category
-            var project_top = _.clone(project);
-            project_top.slug = 'top-gen';
-            delete project_top.categories;
-            library.addProject(project_top, source_language_de.id);
-            library.addProject(project_top, source_language_en.id);
-
-            // german project with category
-            var project_de = _.clone(project);
-            project_de.categories = [{
-                name: 'German Old Testament',
-                slug: 'bible-ot'
+            var project1 = _.clone(project);
+            project1.slug = 'proj-1';
+            delete project1.categories;
+            var project2 = _.clone(project);
+            project2.slug = 'proj-2';
+            delete project2.categories;
+            // projects with category
+            var project3 = _.clone(project);
+            project3.slug = 'proj-3';
+            project3.categories = [{
+                name: 'First Cat',
+                slug: 'first-cat'
             }];
-            project_de.id = library.addProject(project_de, source_language_de.id);
-            // english project with category
-            project.id = library.addProject(project, source_language_en.id);
-
-            // TODO: test with translate mode
-            var result = library.public_getters.getProjectCategories(0, source_language_fr.slug, null);
-            expect(result.length).toEqual(2);
-            result.forEach(function(item) {
-                expect(item.source_language_slug).toEqual(source_language_en.slug);
-            });
-        });
-
-
-
-        it('should return one project category in French and the rest in English', () => {
-            // projects with no category
-            var project_top = _.clone(project);
-            project_top.slug = 'top-gen';
-            delete project_top.categories;
-            library.addProject(project_top, source_language_fr.id); // french project
-            library.addProject(project_top, source_language_en.id);
-
-            // german project with category
-            var project_de = _.clone(project);
-            project_de.categories = [{
-                name: 'German Old Testament',
-                slug: 'bible-ot'
+            var project4 = _.clone(project);
+            project4.slug = 'proj-4';
+            project4.categories = [{
+                name: 'Second Cat',
+                slug: 'second-cat'
             }];
-            project_de.id = library.addProject(project_de, source_language_de.id);
-            // english project with category
-            project.id = library.addProject(project, source_language_en.id);
 
-            // TODO: test with translate mode
-            var result = library.public_getters.getProjectCategories(0, source_language_fr.slug, null);
-            expect(result.length).toEqual(2);
-            var numEN = 0;
-            var numFR = 0;
-            var numOther = 0;
-            result.forEach(function(item) {
-                if(item.source_language_slug === source_language_en.slug) {
-                    numEN ++;
-                } else if(item.source_language_slug === source_language_fr.slug) {
-                    numFR ++;
-                } else {
-                    numOther ++;
-                }
+            // library.addProject(project1, source_language_fr.id);
+            library.addProject(project1, source_language_de.id);
+            library.addProject(project1, source_language_en.id);
+
+            library.addProject(project2, source_language_fr.id);
+            library.addProject(project2, source_language_de.id);
+            // library.addProject(project2, source_language_en.id);
+
+            library.addProject(project3, source_language_fr.id);
+            // library.addProject(project3, source_language_de.id);
+            library.addProject(project3, source_language_en.id);
+
+            // library.addProject(project4, source_language_fr.id);
+            library.addProject(project4, source_language_de.id);
+            library.addProject(project4, source_language_en.id);
+
+            const expectLanguageCount = function(result, expectedCounts) {
+                var counts = {};
+                result.forEach(function(item) {
+                    if(!counts[item.source_language_slug]) counts[item.source_language_slug] = 0;
+                    counts[item.source_language_slug] ++;
+                });
+                _.keys(expectedCounts).forEach(function(key) {
+                    if(!counts[key]) counts[key] = 0;
+                    expect(counts[key]).toEqual(expectedCounts[key]);
+                });
+            };
+
+            // TODO: test these getters with translate mode
+
+            // de
+            var deResult = library.public_getters.getProjectCategories(0, source_language_de.slug, null);
+            expectLanguageCount(deResult, {
+                de: 3,
+                fr: 0,
+                en: 1
             });
-            expect(numFR).toEqual(1);
-            expect(numEN).toEqual(1);
-            expect(numOther).toEqual(0);
+
+            // fr
+            var frResult = library.public_getters.getProjectCategories(0, source_language_fr.slug, null);
+            expectLanguageCount(frResult, {
+                de: 0,
+                fr: 2,
+                en: 2
+            });
+
+            // en
+            var enResult = library.public_getters.getProjectCategories(0, source_language_en.slug, null);
+            expectLanguageCount(enResult, {
+                de: 1,
+                fr: 0,
+                en: 3
+            });
+
+            // default (en)
+            var missingLangId = 'missing';
+            var defaultResult = library.public_getters.getProjectCategories(0, missingLangId, null);
+            expectLanguageCount(defaultResult, {
+                de: 1,
+                fr: 0,
+                en: 3
+            });
         });
     });
 
