@@ -269,6 +269,7 @@ describe('Client', () => {
         library.__queueResponse = {
             id: 1,
             slug: 'obs',
+            type: 'book',
             formats: [
                 {
                     syntax_version: '1.0',

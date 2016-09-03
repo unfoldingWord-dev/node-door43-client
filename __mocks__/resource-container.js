@@ -28,11 +28,10 @@ module.exports = {
         convertResource: jest.fn(function(data, dir, opts) {
             return Promise.resolve({});
         }),
-        makeSlug: jest.fn(function(language_slug, project_slug, container_type, resource_slug) {
-            if(!language_slug || !project_slug || !container_type || !resource_slug) throw new Error('Invalid resource container slug parameters');
+        makeSlug: jest.fn(function(language_slug, project_slug, resource_slug) {
+            if(!language_slug || !project_slug || !resource_slug) throw new Error('Invalid resource container slug parameters');
             return language_slug
                 + '_' + project_slug
-                + '_' + container_type
                 + '_' + resource_slug;
         }),
         mimeToType: jest.fn(function(mime_type) {
