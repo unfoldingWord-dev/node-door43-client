@@ -600,6 +600,7 @@ describe('Library', () => {
             resource = {
                 slug: 'ulb',
                 name: 'Unlocked Literal Bible',
+                type: 'book',
                 status: {
                     translate_mode: 'gl',
                     checking_level: '3',

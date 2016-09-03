@@ -77,6 +77,7 @@ CREATE TABLE `resource` (
   `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
   `slug` TEXT NOT NULL,
   `name` TEXT NOT NULL,
+  `type` TEXT NOT NULL,
   `translate_mode` TEXT NOT NULL,
   `checking_level` TEXT NOT NULL,
   `comments` TEXT NULL DEFAULT NULL,
