@@ -89,6 +89,20 @@ CREATE TABLE `resource` (
   FOREIGN KEY (project_id) REFERENCES `project` (`id`) ON DELETE CASCADE
 );
 
+-- ---
+-- Table 'legacy_resource_info'
+--
+-- ---
+
+DROP TABLE IF EXISTS `legacy_resource_info`;
+
+CREATE TABLE `legacy_resource_info` (
+  `id` INTEGER NOT NULL PRIMARY KEY AUTOINCREMENT,
+  `translation_words_assignments_url` TEXT NULL DEFAULT NULL,
+  `resource_id` INTEGER NOT NULL,
+  UNIQUE (`resource_id`),
+  FOREIGN KEY (resource_id) REFERENCES `resource` (`id`) ON DELETE CASCADE
+);
 
 -- ---
 -- Table 'resource_format'
