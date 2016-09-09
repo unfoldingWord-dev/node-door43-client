@@ -26,7 +26,7 @@ describe('Library', () => {
     }
 
     function alter(object, alteredKeys) {
-        var alternate = _.clone(object);
+        var alternate = _.cloneDeep(object);
         _.each(alteredKeys, function(value, index) {
             alternate[value] += '-alt';
         });
@@ -43,7 +43,7 @@ describe('Library', () => {
      * @param cleanArgs
      */
     function testInsert(setter, getter, insertObject, setterExtraArgs, getterExtraArgs, cleanArgs) {
-        var object = _.clone(insertObject);
+        var object = _.cloneDeep(insertObject);
         setterExtraArgs = setterExtraArgs || [];
         getterExtraArgs = getterExtraArgs || [];
         cleanArgs = cleanArgs || [];
@@ -389,20 +389,20 @@ describe('Library', () => {
 
         it('should return project categories in a single language', () => {
             // projects with no category
-            var project1 = _.clone(project);
+            var project1 = _.cloneDeep(project);
             project1.slug = 'proj-1';
             delete project1.categories;
-            var project2 = _.clone(project);
+            var project2 = _.cloneDeep(project);
             project2.slug = 'proj-2';
             delete project2.categories;
             // projects with category
-            var project3 = _.clone(project);
+            var project3 = _.cloneDeep(project);
             project3.slug = 'proj-3';
             project3.categories = [{
                 name: 'First Cat',
                 slug: 'first-cat'
             }];
-            var project4 = _.clone(project);
+            var project4 = _.cloneDeep(project);
             project4.slug = 'proj-4';
             project4.categories = [{
                 name: 'Second Cat',
@@ -411,21 +411,62 @@ describe('Library', () => {
 
             library.addProject(project1, source_language_fr.id);
             library.addProject(project1, source_language_de.id);
-            library.addProject(project1, source_language_en.id);
+            var id1 = library.addProject(project1, source_language_en.id);
 
             library.addProject(project2, source_language_fr.id);
             library.addProject(project2, source_language_de.id);
-            library.addProject(project2, source_language_en.id);
+            var id2 = library.addProject(project2, source_language_en.id);
 
             library.addProject(project3, source_language_fr.id);
             library.addProject(project3, source_language_de.id);
-            library.addProject(project3, source_language_en.id);
+            var id3 = library.addProject(project3, source_language_en.id);
 
             library.addProject(project4, source_language_fr.id);
             library.addProject(project4, source_language_de.id);
-            library.addProject(project4, source_language_en.id);
+            var id4 = library.addProject(project4, source_language_en.id);
 
-            // TODO: test these getters with translate mode
+            var resource_all = {
+                slug: 'ulb',
+                name: 'Unlocked Literal Bible',
+                type: 'book',
+                status: {
+                    translate_mode: 'all',
+                    checking_level: '3',
+                    version: '3'
+                },
+                formats: [{
+                    package_version: 1,
+                    mime_type: 'application/ts+book',
+                    modified_at: 20151222120130,
+                    url: 'https://api.unfoldingword.org/ts/txt/2/gen/en/ulb/source.json'
+                }]
+            };
+            var resource_gl = _.cloneDeep(resource_all);
+            resource_gl.status.translate_mode = 'gl';
+
+            library.addResource(resource_all, id1);
+            library.addResource(resource_all, id2);
+            library.addResource(resource_all, id3);
+
+            library.addResource(resource_gl, id4);
+
+            // all translate mode
+            var allModeResult = library.public_getters.getProjectCategories(0, source_language_en.slug, 'all');
+            expect(allModeResult.length).toEqual(3); // 2 projects and 1 category
+            var numAllProj = 0;
+            allModeResult.forEach(function(item) {
+                if(item.type == 'project') numAllProj ++;
+            });
+            expect(numAllProj).toEqual(2);
+
+            // gl translate mode
+            var glModeResult = library.public_getters.getProjectCategories(0, source_language_en.slug, 'gl');
+            expect(glModeResult.length).toEqual(1); // 1 category
+            var numGlCategory = 0;
+            glModeResult.forEach(function(item) {
+                if(item.type == 'category') numGlCategory ++;
+            });
+            expect(numGlCategory).toEqual(1);
 
             // de
             var deResult = library.public_getters.getProjectCategories(0, source_language_de.slug, null);
@@ -459,20 +500,20 @@ describe('Library', () => {
 
         it('should return one project categories in mixed languages', () => {
             // projects with no category
-            var project1 = _.clone(project);
+            var project1 = _.cloneDeep(project);
             project1.slug = 'proj-1';
             delete project1.categories;
-            var project2 = _.clone(project);
+            var project2 = _.cloneDeep(project);
             project2.slug = 'proj-2';
             delete project2.categories;
             // projects with category
-            var project3 = _.clone(project);
+            var project3 = _.cloneDeep(project);
             project3.slug = 'proj-3';
             project3.categories = [{
                 name: 'First Cat',
                 slug: 'first-cat'
             }];
-            var project4 = _.clone(project);
+            var project4 = _.cloneDeep(project);
             project4.slug = 'proj-4';
             project4.categories = [{
                 name: 'Second Cat',
