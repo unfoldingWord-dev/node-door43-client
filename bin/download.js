@@ -22,6 +22,14 @@ exports.builder = {
         description: 'The directory where resource containers will be downloaded',
         default: path.join(process.cwd(), 'resource_containers')
     },
+    l: {
+        alias: 'lang',
+        description: 'Limit the download to only resources in the given language. e.g. "en"'
+    },
+    p: {
+        alias: 'proj',
+        description: 'Limit the download to a single project. e.g. "gen"'
+    },
     f: {
         alias: 'force',
         description: 'Overwrites the directory if it already exists',
