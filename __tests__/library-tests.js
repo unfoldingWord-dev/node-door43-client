@@ -617,6 +617,7 @@ describe('Library', () => {
                 }],
                 project_id: project.id,
                 project_slug: project.slug,
+                translation_words_assignments_url: null,
                 source_language_slug: source_language.slug
             };
             resourceAlt = alter(resource, ['name']);
