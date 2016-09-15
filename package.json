@@ -1,7 +1,7 @@
 {
   "name": "door43-client",
   "version": "0.3.7",
-  "description": "A client library for interacting with the Door43 Resource Catalog.",
+  "description": "A client library for interacting with the Door43 Resource API.",
   "main": "./lib/main.js",
   "scripts": {
     "test": "jest"
