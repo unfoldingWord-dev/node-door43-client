@@ -234,7 +234,7 @@ describe('Client', () => {
             formats: [
                 {
                     syntax_version: '1.0',
-                    mime_type: 'application/ts+book',
+                    mime_type: 'application/tsrc+book',
                     modified_at: 0,
                     url: 'some/url',
                 }
@@ -314,7 +314,7 @@ describe('Client', () => {
             formats: [
                 {
                     syntax_version: '1.0',
-                    mime_type: 'application/ts+book',
+                    mime_type: 'application/tsrc+book',
                     modified_at: 0,
                     url: 'some/url',
                 }
@@ -385,7 +385,7 @@ describe('Client', () => {
             },
             formats: [{
                 syntax_version: '1.0',
-                mime_type: 'application/ts+book',
+                mime_type: 'application/tsrc+book',
                 modified_at: 20151222120130,
                 url: 'https://api.unfoldingword.org/ts/txt/2/obs/en/obs/source.json'
             }],
@@ -436,7 +436,7 @@ describe('Client', () => {
             ]
         };
 
-        return client.legacy_tools.convertResource('en', 'obs', 'book', 'obs', JSON.stringify(data))
+        return client.legacy_tools.convertResource('en', 'obs', 'obs', JSON.stringify(data))
             .then(function(container) {
                 let rc = require('resource-container');
                 expect(rc.tools.makeSlug.mock.calls.length).toEqual(1);
