@@ -12,6 +12,8 @@ jest.unmock('path');
 
 const path = require('path');
 const rimraf = require('rimraf');
+const mkdirp = require('mkdirp');
+const fileUtils = require('../lib/utils/files');
 
 const config = {
     schemaPath: path.normalize(path.join(__dirname, '../lib/schema.sqlite')),
@@ -228,6 +230,15 @@ describe('Client', () => {
     });
 
     it('should download a resource container', () => {
+        let fs = require('fs');
+        let archiveDir = path.join(config.resDir, 'en_obs_obs');
+        let archiveFile = archiveDir + '.tsrc';
+        fs.writeFileSync(archiveFile, 'some file');
+        mkdirp(archiveDir);
+
+        expect(fileUtils.fileExists(archiveFile)).toBeTruthy();
+        expect(fileUtils.fileExists(archiveDir)).toBeTruthy();
+
         library.__queueResponse = {
             id: 1,
             slug: 'obs',
@@ -245,6 +256,8 @@ describe('Client', () => {
         return client.legacy_tools.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
                 expect(request.download.mock.calls.length).toEqual(1);
+                expect(fileUtils.fileExists(archiveFile)).toBeTruthy();
+                expect(fileUtils.fileExists(archiveDir)).not.toBeTruthy();
             })
             .catch(function(err) {
                 throw err;
