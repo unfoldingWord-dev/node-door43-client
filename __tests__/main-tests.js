@@ -258,6 +258,7 @@ describe('Client', () => {
                 expect(request.download.mock.calls.length).toEqual(1);
                 expect(fileUtils.fileExists(archiveFile)).toBeTruthy();
                 expect(fileUtils.fileExists(archiveDir)).not.toBeTruthy();
+                expect(fileUtils.fileExists(path.join(config.resDir, 'en_obs_obs.tsrc'))).toBeTruthy();
             })
             .catch(function(err) {
                 throw err;
@@ -275,6 +276,7 @@ describe('Client', () => {
             .catch(function(err) {
                 expect(err.message).toEqual('Unknown resource');
                 expect(request.download.mock.calls.length).toEqual(0);
+                expect(fileUtils.fileExists(path.join(config.resDir, 'en_obs_obs.tsrc'))).not.toBeTruthy();
             });
     });
 
@@ -300,6 +302,7 @@ describe('Client', () => {
             .catch(function(err) {
                 expect(err.message).toEqual('Missing resource container format');
                 expect(request.download.mock.calls.length).toEqual(0);
+                expect(fileUtils.fileExists(path.join(config.resDir, 'en_obs_obs.tsrc'))).not.toBeTruthy();
             });
     });
 
@@ -317,6 +320,7 @@ describe('Client', () => {
             .catch(function(err) {
                 expect(err.message).toEqual('Missing resource container format');
                 expect(request.download.mock.calls.length).toEqual(0);
+                expect(fileUtils.fileExists(path.join(config.resDir, 'en_obs_obs.tsrc'))).not.toBeTruthy();
             });
     });
 
@@ -342,6 +346,7 @@ describe('Client', () => {
             .catch(function(err) {
                 expect(err.status).toEqual(400);
                 expect(request.download.mock.calls.length).toEqual(1);
+                expect(fileUtils.fileExists(path.join(config.resDir, 'en_obs_obs.tsrc'))).not.toBeTruthy();
             });
     });
 
