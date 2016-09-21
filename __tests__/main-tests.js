@@ -457,6 +457,7 @@ describe('Client', () => {
                 expect(library.public_getters.getProject.mock.calls.length).toEqual(1);
                 expect(library.public_getters.getResource.mock.calls.length).toEqual(1);
                 expect(rc.tools.convertResource.mock.calls.length).toEqual(1);
+                expect(container).not.toBeNull();
             });
     });
 });
