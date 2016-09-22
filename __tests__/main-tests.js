@@ -259,6 +259,7 @@ describe('Client', () => {
                 expect(fileUtils.fileExists(archiveFile)).toBeTruthy();
                 expect(fileUtils.fileExists(archiveDir)).not.toBeTruthy();
                 expect(fileUtils.fileExists(path.join(config.resDir, 'en_obs_obs.tsrc'))).toBeTruthy();
+                expect(fileUtils.fileExists(path.join(config.resDir, 'en_obs_obs'))).not.toBeTruthy();
             })
             .catch(function(err) {
                 throw err;
