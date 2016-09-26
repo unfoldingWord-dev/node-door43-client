@@ -34,7 +34,7 @@
     "lodash": "^4.13.1",
     "mkdirp": "^0.5.1",
     "mv": "^2.1.1",
-    "resource-container": "^0.8.2",
+    "resource-container": "^0.8.3",
     "rimraf": "^2.5.3",
     "sql.js": "^0.2.21",
     "tar-fs": "^1.13.0",
