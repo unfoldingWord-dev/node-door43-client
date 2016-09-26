@@ -767,4 +767,43 @@ describe('Update check', () => {
                 expect(err.status).toEqual(400);
             });
     });
+
+    it('should download and index chunks', function() {
+        library.__queueResponse = [{
+            slug: 'gen'
+        }];
+        library.__queueResponse = {
+            name: 'American English',
+            slug: 'en-US',
+            id: 1
+        };
+        request.__queueStatusCode = 200;
+        request.__queueResponse = JSON.stringify([
+            {
+                chp: "01",
+                firstvs: "01"
+            },
+            {
+                chp: "01",
+                firstvs: "03"
+            },
+            {
+                chp: "01",
+                firstvs: "06"
+            },
+            {
+                chp: "01",
+                firstvs: "09"
+            }
+        ]);
+        request.__setStatusCode = 400;
+
+        return client.updateChunks()
+            .then(() => {
+                expect(library.addChunkMarker.mock.calls.length).toEqual(4);
+            })
+            .catch((err) => {
+                expect(err.status).toEqual(400);
+            });
+    });
 });
