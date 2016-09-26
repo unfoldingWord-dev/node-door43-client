@@ -28,6 +28,7 @@
   },
   "dependencies": {
     "adm-zip": "^0.4.7",
+    "agentkeepalive": "^2.2.0",
     "archiver": "^1.0.1",
     "compressjs": "^1.0.3",
     "lodash": "^4.13.1",

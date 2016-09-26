@@ -20,6 +20,7 @@ function writeProgress(id, total, completed) {
     var progressTitles = {
         projects: 'Indexing Projects',
         chunks: 'Indexing Chunks',
+        ta: 'Indexing translationAcademy',
         resources: 'Indexing Resources',
         container: 'Downloading Containers',
         catalog: 'Indexing Catalogs',
