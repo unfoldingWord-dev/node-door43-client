@@ -761,7 +761,7 @@ describe('Update check', () => {
                 expect(library.addSourceLanguage.mock.calls.length).toEqual(1);
                 expect(library.addProject.mock.calls.length).toEqual(1);
                 expect(library.addResource.mock.calls.length).toEqual(1);
-                // TODO: test adding ta
+                // TODO: test TA
             })
             .catch((err) => {
                 expect(err.status).toEqual(400);
