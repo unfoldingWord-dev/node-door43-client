@@ -1,6 +1,6 @@
 {
   "name": "door43-client",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "A client library for interacting with the Door43 Resource API.",
   "main": "./lib/main.js",
   "scripts": {
@@ -34,7 +34,7 @@
     "lodash": "^4.13.1",
     "mkdirp": "^0.5.1",
     "mv": "^2.1.1",
-    "resource-container": "^0.8.4",
+    "resource-container": "^0.9.0",
     "rimraf": "^2.5.3",
     "sql.js": "^0.2.21",
     "tar-fs": "^1.13.0",
