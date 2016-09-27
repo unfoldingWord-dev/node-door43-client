@@ -129,7 +129,8 @@ exports.handler = function(argv) {
                 } else {
                     readline.cursorTo(process.stdout, 0);
                     readline.clearLine(process.stdout, 0);
-                    fs.writeFileSync(path.join(argv.dir, 'log.txt'), err.toString());
+                    var errMessage = err.status ? err.status : err.toString();
+                    fs.writeFileSync(path.join(argv.dir, 'log.txt'), errMessage + ': while downloading:\n' + JSON.stringify(data) + '\n\n', {flag: 'a'});
                     console.log('\n', err, 'while downloading', data);
                 }
                 return false;
