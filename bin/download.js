@@ -129,6 +129,7 @@ exports.handler = function(argv) {
                 } else {
                     readline.cursorTo(process.stdout, 0);
                     readline.clearLine(process.stdout, 0);
+                    fs.writeFileSync(path.join(argv.dir, 'log.txt'), err.toString());
                     console.log('\n', err, 'while downloading', data);
                 }
                 return false;
