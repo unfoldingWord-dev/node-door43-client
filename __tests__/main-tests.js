@@ -83,7 +83,7 @@ describe('Client', () => {
                 res_catalog: "https://api.unfoldingword.org/ts/txt/2/1ch/en/resources.json?date_modified=20160614"
             }
         ]);
-        request.__queueResponse = '[{"chp": "01", "firstvs": "01"}, {"chp": "01", "firstvs": "05"}, {"chp": "01", "firstvs": "08"}]';
+        // request.__queueResponse = '[{"chp": "01", "firstvs": "01"}, {"chp": "01", "firstvs": "05"}, {"chp": "01", "firstvs": "08"}]';
         request.__queueResponse = JSON.stringify([
             {
                 checking_questions: "https://api.unfoldingword.org/ts/txt/2/1ch/en/questions.json?date_modified=20160504",
@@ -118,7 +118,7 @@ describe('Client', () => {
                 expect(library.addProject.mock.calls.length).toEqual(2); // project, words
                 expect(library.addSourceLanguage.mock.calls.length).toEqual(1);
                 expect(library.addVersification.mock.calls.length).toEqual(1); // versification
-                expect(library.addChunkMarker.mock.calls.length).toEqual(3); // chunks
+                // expect(library.addChunkMarker.mock.calls.length).toEqual(3); // chunks
                 expect(library.addResource.mock.calls.length).toEqual(4); // content, notes, questions, words
             })
             .catch(function(err) {
@@ -704,6 +704,106 @@ describe('Update check', () => {
         return client.findUpdates.projects(langSlug)
             .then(function(projects) {
                 expect(projects.sort()).toEqual(expected.sort());
+            });
+    });
+
+    it('should download and index tA', function() {
+        request.__queueStatusCode = 200;
+        request.__queueResponse = JSON.stringify({
+            articles: [
+                {
+                    depend: [
+                        "ta_intro",
+                        "translation_guidelines",
+                        "finding_answers"
+                    ],
+                    id: "translate_manual",
+                    question: "What is the Translation Manual?",
+                    recommend: [
+                        "translate_why",
+                        "guidelines_intro",
+                        "translate_process",
+                        "translation_difficulty"
+                    ],
+                    ref: "vol1/translate/translate_manual",
+                    text: "### What Does the Translation Manual Teach? This manual teaches translation theory and how to make a good translation for Other Languages (OLs). Some of the principles of translation in this manual also apply to Gateway Language translation. For specific instruction on how to translate the set of translation tools for Gateway Languages, however, please see the Gateway Language Manual. It will be very helpful to study many of these modules before starting any type of translation project. Other modules, such as the ones about grammar, are only needed for \"just-in-time\" learning. Some highlights in the Translation Manual: * [The Qualities of a Good Translation](https://git.door43.org/Door43/en-ta-translate-vol1/src/master/content/guidelines_intro.md) - defining a good translation * [The Translation Process](https://git.door43.org/Door43/en-ta-translate-vol1/src/master/content/translate_process.md) - how to achieve a good translation * [Choosing a Translation Team](https://git.door43.org/Door43/en-ta-translate-vol1/src/master/content/choose_team.md) - some items to consider before starting a translation project * [Choosing What to Translate](https://git.door43.org/Door43/en-ta-translate-vol1/src/master/content/translation_difficulty.md) - what to start translating ",
+                    title: "Introduction to Translation Manual"
+                }
+            ],
+            meta: {
+                language: {
+                    anglicized_name: "English",
+                    direction: "ltr",
+                    lc: "en",
+                    name: "English"
+                },
+                manual: "translate",
+                manual_title: "Translation Manual Volume 1",
+                mod: 1467416351,
+                status: {
+                    checking_entity: "Wycliffe Associates",
+                    checking_level: "3",
+                    comments: "",
+                    contributors: "unfoldingWord; Wycliffe Associates",
+                    license: "CC BY-SA 4.0",
+                    publish_date: "2016-07-01",
+                    source_text: "en",
+                    source_text_version: "5",
+                    version: "5"
+                },
+                volume: "1"
+            }
+        });
+        request.__setStatusCode = 400;
+
+        return client.updateTA()
+            .then(() => {
+                expect(library.addSourceLanguage.mock.calls.length).toEqual(1);
+                expect(library.addProject.mock.calls.length).toEqual(1);
+                expect(library.addResource.mock.calls.length).toEqual(1);
+                // TODO: test TA
+            })
+            .catch((err) => {
+                expect(err.status).toEqual(400);
+            });
+    });
+
+    it('should download and index chunks', function() {
+        library.__queueResponse = [{
+            slug: 'gen'
+        }];
+        library.__queueResponse = {
+            name: 'American English',
+            slug: 'en-US',
+            id: 1
+        };
+        request.__queueStatusCode = 200;
+        request.__queueResponse = JSON.stringify([
+            {
+                chp: "01",
+                firstvs: "01"
+            },
+            {
+                chp: "01",
+                firstvs: "03"
+            },
+            {
+                chp: "01",
+                firstvs: "06"
+            },
+            {
+                chp: "01",
+                firstvs: "09"
+            }
+        ]);
+        request.__setStatusCode = 400;
+
+        return client.updateChunks()
+            .then(() => {
+                expect(library.addChunkMarker.mock.calls.length).toEqual(4);
+            })
+            .catch((err) => {
+                expect(err.status).toEqual(400);
             });
     });
 });

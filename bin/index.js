@@ -46,12 +46,21 @@ exports.handler = function(argv) {
 
     console.log('Generating primary index:');
     var client = new Door43Client(indexPath, null);
-    client.updatePrimaryIndex(argv.url, function(id, total, completed) {
-        util.logProgress(id, total, completed);
-    }).then(function() {
+    client.updatePrimaryIndex(argv.url, util.logProgress).then(function() {
         // index the catalogs
         console.log('\n\nGenerating catalog indexes:');
         return indexCatalogs(client);
+    }).then(function() {
+        // index chunks
+        console.log('\n\nGenerating chunks indexes:');
+        return client.updateChunks(util.logProgress);
+    }).then(function() {
+        // index tA
+        console.log('\n\nGenerating tA indexes:');
+        return client.updateTA(util.logProgress);
+    }).then(function() {
+        // done
+        return true;
     }).catch(function(err) {
         console.error(err);
     });
@@ -71,9 +80,5 @@ function indexCatalogs(client) {
                 console.log(err);
                 return false;
             })(list);
-        })
-        .then(function() {
-            // so gulp doesn't choke
-            console.log('\nFinished!');
         });
 }
