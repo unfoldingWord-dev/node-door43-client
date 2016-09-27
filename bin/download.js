@@ -35,6 +35,15 @@ exports.builder = {
         description: 'Overwrites the directory if it already exists',
         default: false
     },
+    log: {
+        description: 'Log errors to log.txt',
+        default: false
+    },
+    v: {
+        alias: 'verbose',
+        description: 'Display errors to the console',
+        default: false
+    }
 };
 exports.handler = function(argv) {
     // don't overwrite
@@ -82,7 +91,7 @@ exports.handler = function(argv) {
                 }
             }
             var errHandler = function(err, data){
-                console.log(err);
+                if(argv.verbose) console.log(err);
                 return false;
             };
 
@@ -104,7 +113,7 @@ exports.handler = function(argv) {
                 }
             }
             return promiseUtils.chain(client.index.getResources, function(err, data) {
-                console.log(err);
+                if(argv.verbose) console.log(err);
                 return false;
             })(list);
         })
@@ -123,15 +132,21 @@ exports.handler = function(argv) {
             return promiseUtils.chain(client.downloadResourceContainer, function(err, data) {
 
                 if(err.message === 'Resource container already exists') {
-                    readline.cursorTo(process.stdout, 0);
-                    readline.clearLine(process.stdout, 0);
-                    console.log('\nSkipping', data);
+                    if(argv.verbose) {
+                        readline.cursorTo(process.stdout, 0);
+                        readline.clearLine(process.stdout, 0);
+                        console.log('\nSkipping', data);
+                    }
                 } else {
-                    readline.cursorTo(process.stdout, 0);
-                    readline.clearLine(process.stdout, 0);
-                    var errMessage = err.status ? err.status : err.toString();
-                    fs.writeFileSync(path.join(argv.dir, 'log.txt'), errMessage + ': while downloading:\n' + JSON.stringify(data) + '\n\n', {flag: 'a'});
-                    console.log('\n', err, 'while downloading', data);
+                    if(argv.log) {
+                        var errMessage = err.status ? err.status : err.toString();
+                        fs.writeFileSync(path.join(argv.dir, 'log.txt'), errMessage + ': while downloading:\n' + JSON.stringify(data) + '\n\n', {flag: 'a'});
+                    }
+                    if(argv.verbose) {
+                        readline.cursorTo(process.stdout, 0);
+                        readline.clearLine(process.stdout, 0);
+                        console.log('\n', err, 'while downloading', data);
+                    }
                 }
                 return false;
             }, {compact: true, onProgress: function(total, completed) {
@@ -142,6 +157,6 @@ exports.handler = function(argv) {
             console.log('\nFinished!');
         })
         .catch(function(err) {
-            console.error(err);
+            if(argv.verbose) console.error(err);
         });
 };

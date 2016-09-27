@@ -5,7 +5,6 @@ const fs = require('fs');
 const mkdirp = require('mkdirp');
 const rimraf = require('rimraf');
 const Door43Client = require('../');
-const promiseUtils = require('../lib/utils/promises');
 const util = require('./util');
 
 exports.command = 'index';
@@ -44,41 +43,19 @@ exports.handler = function(argv) {
 
     mkdirp.sync(path.dirname(indexPath));
 
-    console.log('Generating primary index:');
+    console.log('Indexing source:');
     var client = new Door43Client(indexPath, null);
-    client.updatePrimaryIndex(argv.url, util.logProgress).then(function() {
-        // index the catalogs
-        console.log('\n\nGenerating catalog indexes:');
-        return indexCatalogs(client);
-    }).then(function() {
-        // index chunks
-        console.log('\n\nGenerating chunks indexes:');
-        return client.updateChunks(util.logProgress);
-    }).then(function() {
-        // index tA
-        console.log('\n\nGenerating tA indexes:');
-        return client.updateTA(util.logProgress);
-    }).then(function() {
-        // done
-        return true;
-    }).catch(function(err) {
-        console.error(err);
-    });
-};
-
-function indexCatalogs(client) {
-    return client.index.getCatalogs()
-        .then(function(catalogs) {
-            var list = [];
-            for(var catalog of catalogs) {
-                list.push({
-                    slug: catalog.slug,
-                    onProgress: util.logProgress
-                });
-            }
-            return promiseUtils.chain(client.updateCatalogIndex, function (err, data) {
-                console.log(err);
-                return false;
-            })(list);
+    client.updateSources(argv.url, util.logProgress)
+        .then(function() {
+            // index the catalogs
+            console.log('\n\nIndexing catalogs:');
+            return client.updateCatalogs(util.logProgress);
+        })
+        .then(function() {
+            // done
+            return true;
+        })
+        .catch(function(err) {
+            console.error(err);
         });
-}
+};
