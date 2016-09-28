@@ -43,6 +43,11 @@ exports.builder = {
         alias: 'verbose',
         description: 'Display errors to the console',
         default: false
+    },
+    c: {
+        alias: 'close',
+        description: 'Will close the downloaded resource containers',
+        default: false
     }
 };
 exports.handler = function(argv) {
@@ -75,6 +80,16 @@ exports.handler = function(argv) {
         } else {
             return client.index.getSourceLanguages();
         }
+    };
+
+    var download = function(opts) {
+        return client.downloadResourceContainer(opts)
+            .then(function(c) {
+                if(argv.close) {
+                    client.closeResourceContainer(c.info.language.slug, c.info.project.slug, c.info.resource.slug);
+                }
+                return Promise.resolve();
+            });
     };
 
     getLanguages(argv.lang)
@@ -129,7 +144,7 @@ exports.handler = function(argv) {
                 }
             }
             console.log('Downloading ' + list.length + ' items...');
-            return promiseUtils.chain(client.downloadResourceContainer, function(err, data) {
+            return promiseUtils.chain(download, function(err, data) {
 
                 if(err.message === 'Resource container already exists') {
                     if(argv.verbose) {
