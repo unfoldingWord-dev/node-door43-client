@@ -47,6 +47,9 @@ exports.handler = function(argv) {
     var client = new Door43Client(indexPath, null);
     client.updateSources(argv.url, util.logProgress)
         .then(function() {
+            return client.updateChunks(util.logProgress);
+        })
+        .then(function() {
             // index the catalogs
             console.log('\n\nIndexing catalogs:');
             return client.updateCatalogs(util.logProgress);
