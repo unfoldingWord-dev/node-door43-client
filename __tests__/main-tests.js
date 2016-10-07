@@ -859,6 +859,7 @@ describe('Update check', () => {
                 expect(library.addTargetLanguage.mock.calls.length).toEqual(0);
                 expect(library.addQuestionnaire.mock.calls.length).toEqual(0);
                 expect(library.addQuestion.mock.calls.length).toEqual(0);
+                expect(request.read.mock.calls.length).toEqual(1);
             });
     });
 
