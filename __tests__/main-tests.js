@@ -769,7 +769,8 @@ describe('Update check', () => {
 
     it('should download and index chunks', function() {
         library.__queueResponse = [{
-            slug: 'gen'
+            slug: 'gen',
+            chunks_url: 'some/url'
         }];
         library.__queueResponse = {
             name: 'American English',
@@ -797,13 +798,269 @@ describe('Update check', () => {
         ]);
         request.__setStatusCode = 400;
 
-        return client.legacy_tools.updateChunks()
+        return client.updateChunks()
             .then(() => {
                 expect(library.addChunkMarker.mock.calls.length).toEqual(4);
                 expect(library.addVersification.mock.calls.length).toEqual(1); // versification
             })
             .catch((err) => {
                 expect(err.status).toEqual(400);
+            });
+    });
+
+    it('should abort catalog downloads when exception is thrown', function() {
+        library.__queueResponse = [{
+                slug: 'langnames',
+                chunks_url: 'some/url'
+            },
+            {
+                slug: 'new-language-questions',
+                chunks_url: 'some/url'
+            }];
+        library.__queueResponse = {
+            slug: 'langnames',
+            chunks_url: 'some/url'
+        };
+        library.__queueResponse = {
+            slug: 'new-language-questions',
+            chunks_url: 'some/url'
+        };
+        request.__queueStatusCode = 200;
+        request.__queueResponse = function() {
+            throw new Error('Something bad happened');
+        };
+        request.__queueStatusCode = 200;
+        request.__queueResponse = JSON.stringify([
+            {
+                chp: "01",
+                firstvs: "01"
+            },
+            {
+                chp: "01",
+                firstvs: "03"
+            },
+            {
+                chp: "01",
+                firstvs: "06"
+            },
+            {
+                chp: "01",
+                firstvs: "09"
+            }
+        ]);
+        request.__setStatusCode = 400;
+
+        return client.updateCatalogs()
+            .then(() => {
+                expect(false).toBeTruthy();
+            })
+            .catch((err) => {
+                expect(err instanceof Error);
+                expect(library.addTargetLanguage.mock.calls.length).toEqual(0);
+                expect(library.addQuestionnaire.mock.calls.length).toEqual(0);
+                expect(library.addQuestion.mock.calls.length).toEqual(0);
+            });
+    });
+
+    it('should not abort catalog downloads when 404 is received', function() {
+        library.__queueResponse = [{
+            slug: 'langnames',
+            chunks_url: 'some/url'
+        },
+            {
+                slug: 'new-language-questions',
+                chunks_url: 'some/url'
+            }];
+        library.__queueResponse = {
+            slug: 'langnames',
+            chunks_url: 'some/url'
+        };
+        library.__queueResponse = {
+            slug: 'new-language-questions',
+            chunks_url: 'some/url'
+        };
+        request.__queueStatusCode = 404;
+        request.__queueResponse = JSON.stringify([]);
+        request.__queueStatusCode = 200;
+        request.__queueResponse = JSON.stringify(
+            {
+                languages: [{
+                    questions:[
+                        {
+                            depends_on: null,
+                            id: 0,
+                            sort: 1,
+                            help: "",
+                            required: true,
+                            input_type: "string",
+                            text: "What do you call your language?"
+                        },
+                        {
+                            depends_on: 0,
+                            id: 1,
+                            sort: 2,
+                            help: "",
+                            required: false,
+                            input_type: "string",
+                            text: "Does that have a special meaning?"
+                        }
+                    ],
+                    dir: "ltr",
+                    slug: "en",
+                    questionnaire_id: 1,
+                    language_data: {
+                        ln: 0,
+                        cc: 4
+                    },
+                    name: "English"
+                }]
+            }
+        );
+        request.__setStatusCode = 400;
+
+        return client.updateCatalogs()
+            .then(() => {
+                expect(library.addTargetLanguage.mock.calls.length).toEqual(0);
+                expect(library.addQuestionnaire.mock.calls.length).toEqual(1);
+                expect(library.addQuestion.mock.calls.length).toEqual(2);
+            })
+            .catch((err) => {
+                expect(false).toBeTruthy();
+            });
+    });
+
+    it('should abort catalog downloads at first exception', function() {
+        library.__queueResponse = [{
+            slug: 'langnames',
+            chunks_url: 'some/url'
+        },
+            {
+                slug: 'new-language-questions',
+                chunks_url: 'some/url'
+            }];
+        library.__queueResponse = {
+            slug: 'langnames',
+            chunks_url: 'some/url'
+        };
+        library.__queueResponse = {
+            slug: 'new-language-questions',
+            chunks_url: 'some/url'
+        };
+        request.__queueStatusCode = 200;
+        request.__queueResponse = function() { throw new Error('error 1')};
+        request.__queueStatusCode = 200;
+        request.__queueResponse = function() { throw new Error('error 2')};
+        request.__setStatusCode = 400;
+
+        return client.updateCatalogs()
+            .then(() => {
+                expect(false).toBeTruthy();
+            })
+            .catch((err) => {
+                expect(err instanceof Error).toEqual(true);
+                expect(err.message).toEqual('error 1');
+                expect(library.addTargetLanguage.mock.calls.length).toEqual(0);
+                expect(library.addQuestionnaire.mock.calls.length).toEqual(0);
+                expect(library.addQuestion.mock.calls.length).toEqual(0);
+            });
+    });
+
+    it('should abort halfway through catalog downloads when exception is thrown', function() {
+        library.__queueResponse = [{
+                slug: 'langnames',
+                chunks_url: 'some/url'
+            },
+            {
+                slug: 'new-language-questions',
+                chunks_url: 'some/url'
+            },
+            {
+                slug: 'temp-langnames',
+                chunks_url: 'some/url'
+            }];
+        library.__queueResponse = {
+            slug: 'langnames',
+            chunks_url: 'some/url'
+        };
+        library.__queueResponse = {
+            slug: 'new-language-questions',
+            chunks_url: 'some/url'
+        };
+        request.__queueStatusCode = 200;
+        request.__queueResponse = JSON.stringify([
+            {
+                ang: "Afar",
+                pk: 6,
+                lr: "Africa",
+                ln: "Afaraf",
+                cc: [
+                    "DJ",
+                    "ER",
+                    "ET",
+                    "US",
+                    "CA"
+                ],
+                ld: "ltr",
+                gw: false,
+                lc: "aa",
+                alt: [
+                    "Afaraf",
+                    "Danakil",
+                    "Denkel",
+                    "Adal",
+                    "Afar Af",
+                    "Qafar",
+                    "Baadu (Ba'adu)"
+                ]
+            },
+            {
+                ang: "Ghotuo",
+                pk: 7,
+                lr: "Africa",
+                ln: "Ghotuo",
+                cc: [
+                    "NG"
+                ],
+                ld: "ltr",
+                gw: false,
+                lc: "aaa",
+                alt: [ ]
+            }
+        ]);
+        request.__queueStatusCode = 200;
+        request.__queueResponse = function() {
+            throw new Error('Something bad happened');
+        };
+        request.__queueStatusCode = 200;
+        request.__queueResponse = JSON.stringify([
+            {
+                chp: "01",
+                firstvs: "01"
+            },
+            {
+                chp: "01",
+                firstvs: "03"
+            },
+            {
+                chp: "01",
+                firstvs: "06"
+            },
+            {
+                chp: "01",
+                firstvs: "09"
+            }
+        ]);
+        request.__setStatusCode = 400;
+
+        return client.updateCatalogs()
+            .then(() => {
+                expect(false).toBeTruthy();
+            })
+            .catch((err) => {
+                expect(err instanceof Error);
+                expect(library.addTargetLanguage.mock.calls.length).toEqual(2);
+                expect(library.addQuestionnaire.mock.calls.length).toEqual(0);
+                expect(library.addQuestion.mock.calls.length).toEqual(0);
             });
     });
 });
