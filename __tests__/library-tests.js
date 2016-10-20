@@ -683,6 +683,7 @@ describe('Library', () => {
                 slug: 'ulb',
                 name: 'Unlocked Literal Bible',
                 type: 'book',
+                translation_words_assignments_url: null,
                 status: {
                     translate_mode: 'gl',
                     checking_level: '3',
@@ -691,16 +692,15 @@ describe('Library', () => {
                     license: 'CC BY-SA',
                     version: '3.0'
                 },
+                source_language_slug: source_language.slug,
+                project_slug: project.slug,
                 formats: [{
-                    package_version: 1,
+                    package_version: "1,
                     mime_type: 'application/ts+book',
                     modified_at: 20151222120130,
                     url: 'https://api.unfoldingword.org/ts/txt/2/gen/en/ulb/source.json'
                 }],
-                project_id: project.id,
-                project_slug: project.slug,
-                translation_words_assignments_url: null,
-                source_language_slug: source_language.slug
+                project_id: project.id
             };
             resourceAlt = alter(resource, ['name']);
         });
@@ -708,13 +708,13 @@ describe('Library', () => {
         it('should add a resource to the database', () => {
             testInsert('addResource', 'getResource', resource,
                 [project.id], [source_language.slug, project.slug],
-                ['id']);
+                ['id', 'project_id']);
         });
 
         it('should update a resource in the database', () => {
             testUpdate('addResource', 'getResource', resource, resourceAlt,
                 [source_language.id, project.id], [source_language.slug, project.slug],
-                ['id']);
+                ['id', 'project_id']);
         });
 
         it('should not add incomplete resource to the database', () => {
