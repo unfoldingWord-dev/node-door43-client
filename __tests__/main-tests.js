@@ -83,7 +83,6 @@ describe('Client', () => {
                 res_catalog: "https://api.unfoldingword.org/ts/txt/2/1ch/en/resources.json?date_modified=20160614"
             }
         ]);
-        // request.__queueResponse = '[{"chp": "01", "firstvs": "01"}, {"chp": "01", "firstvs": "05"}, {"chp": "01", "firstvs": "08"}]';
         request.__queueResponse = JSON.stringify([
             {
                 checking_questions: "https://api.unfoldingword.org/ts/txt/2/1ch/en/questions.json?date_modified=20160504",
