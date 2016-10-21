@@ -697,24 +697,26 @@ describe('Library', () => {
                 formats: [{
                     package_version: "1",
                     mime_type: 'application/ts+book',
+                    imported: false,
                     modified_at: 20151222120130,
                     url: 'https://api.unfoldingword.org/ts/txt/2/gen/en/ulb/source.json'
                 }],
                 project_id: project.id
             };
             resourceAlt = alter(resource, ['name']);
+            resourceAlt.formats[0].imported = true;
         });
 
         it('should add a resource to the database', () => {
             testInsert('addResource', 'getResource', resource,
                 [project.id], [source_language.slug, project.slug],
-                ['id', 'project_id']);
+                ['id', 'project_id', 'imported']);
         });
 
         it('should update a resource in the database', () => {
             testUpdate('addResource', 'getResource', resource, resourceAlt,
                 [source_language.id, project.id], [source_language.slug, project.slug],
-                ['id', 'project_id']);
+                ['id', 'project_id', 'imported']);
         });
 
         it('should not add incomplete resource to the database', () => {

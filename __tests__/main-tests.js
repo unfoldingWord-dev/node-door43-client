@@ -265,7 +265,6 @@ describe('Client', () => {
             });
     });
 
-
     it('should not download a missing resource container', () => {
         library.__queueResponse = null;
 
@@ -463,6 +462,68 @@ describe('Client', () => {
                 expect(library.public_getters.getResource.mock.calls.length).toEqual(1);
                 expect(rc.tools.convertResource.mock.calls.length).toEqual(1);
                 expect(container).not.toBeNull();
+            });
+    });
+});
+
+describe('Import', () => {
+    var client, library, fs, rc;
+
+    beforeEach(() => {
+        jest.mock('fs');
+        jest.mock('rimraf');
+        jest.mock('ncp');
+
+        fs = require('fs');
+        rc = require('resource-container');
+        var Client = require('../');
+
+        fs.writeFileSync(config.schemaPath, '');
+        fs.writeFileSync(config.dbPath, '');
+
+        client = new Client(config.dbPath, config.resDir);
+        var Library = require('../lib/library');
+        library = new Library(null);
+    });
+
+    it('should import a resource container', () => {
+        let fs = require('fs');
+        let archiveDir = path.join(config.resDir, 'en_obs_obs');
+        let archiveFile = archiveDir + '.tsrc';
+        fs.writeFileSync(archiveFile, 'some file');
+        mkdirp(archiveDir);
+
+        rc.__queueResponse = {
+            slug: 'en-obs-obs',
+            language: { slug: 'en'},
+            project: { slug: 'gen'},
+            resource: { slug: 'ulb', status: { checking_level: '2'}},
+            get info() { return {}; }
+        };
+
+        library.__queueResponse = {
+            id: 1,
+            slug: 'ulb',
+            formats: [
+                {
+                    syntax_version: '0.1',
+                    mime_type: 'application/tsrc+book',
+                    modified_at: 0,
+                    url: 'some/url',
+                }
+            ]
+        };
+
+        fs.writeFileSync('/container_to_import/package.json', '');
+        fs.writeFileSync('container_to_import/LICENSE.md', 'some license');
+        fs.writeFileSync('container_to_import/content/config.yml', '');
+
+        return client.importResourceContainer('/container_to_import')
+            .then((container) => {
+                // just making sure no errors are throw
+            })
+            .catch(function(err) {
+                throw err;
             });
     });
 });

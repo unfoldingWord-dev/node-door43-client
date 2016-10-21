@@ -9,6 +9,7 @@ let disk = {};
  * @param data
  */
 function writePath(parentDir, path, data) {
+    path = path.replace(/\/+/g, '/').replace(/\/+$/, '');
     let files = path.split('/');
     let file = files.shift();
 
@@ -35,12 +36,46 @@ function readPath(parentDir, path) {
     let files = path.split('/');
     let file = files.shift();
 
-    if(!parentDir[file]) throw new Error('File does not exist');
+    if(!parentDir[file]) throw new Error('File does not exist: ' + path);
 
     if(files.length > 0) {
         return readPath(parentDir[file].tree, files.join('/'));
     } else {
         return parentDir[file];
+    }
+}
+
+function unlink(parentDir, path) {
+    path = path.replace(/\/+/g, '/').replace(/\/+$/, '');
+    let files = path.split('/');
+    let file = files.shift();
+
+    if(!parentDir[file]) return;
+
+    if(files.length > 0) {
+        return unlink(parentDir[file].tree, files.join('/'));
+    } else {
+        delete parentDir[file];
+    }
+}
+
+function stat(path, callback) {
+    try {
+        // check that path exists
+        readPath(disk, path);
+        let stats = {
+            isFile: jest.fn(function() {
+                let content = readPath(disk, path).content;
+                return content !== null && content !== undefined;
+            }),
+            isDirectory: jest.fn(function() {
+                let content = readPath(disk, path).content;
+                return content === null || content === undefined;
+            })
+        };
+        callback(null, stats);
+    } catch(err) {
+        callback(err, null);
     }
 }
 
@@ -77,5 +112,31 @@ module.exports = {
                 return contents === null || contents === undefined;
             })
         };
+    }),
+    stat: jest.fn(stat),
+    lstat: jest.fn(stat),
+    readdir: jest.fn(function(path, options, callback) {
+        if(typeof options === 'function') {
+            callback = options;
+            options = {};
+        }
+        try {
+            let file = readPath(disk, path);
+            callback(null, Object.keys(file.tree));
+        } catch(err) {
+            callback(err, []);
+        }
+    }),
+    unlink: jest.fn(function(path, callback) {
+        unlink(disk, path);
+        callback();
+    }),
+    __deepCopy: jest.fn(function(path, dest) {
+        let inode = readPath(disk, path);
+        // create dummy file
+        writeFileSync(dest, '');
+        let destInode = readPath(disk, dest);
+        destInode.content = undefined;
+        destInode.tree = inode.tree;
     })
 };
