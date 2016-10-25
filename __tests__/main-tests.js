@@ -235,6 +235,8 @@ describe('Client', () => {
         fs.writeFileSync(archiveFile, 'some file');
         mkdirp(archiveDir);
 
+        let rc = require('resource-container');
+
         expect(fileUtils.fileExists(archiveFile)).toBeTruthy();
         expect(fileUtils.fileExists(archiveDir)).toBeTruthy();
 
@@ -250,7 +252,6 @@ describe('Client', () => {
                 }
             ]
         };
-
 
         return client.legacy_tools.downloadFutureCompatibleResourceContainer('en', 'obs', 'obs')
             .then(() => {
