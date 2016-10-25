@@ -1,6 +1,9 @@
+"use strict";
+
 var rimraf = require('rimraf');
 var mkdirp = require('mkdirp');
 var assert = require('assert');
+var fileUtils = require('../lib/utils/files');
 describe('Download', function() {
     let client;
 
@@ -12,8 +15,25 @@ describe('Download', function() {
 
     describe('download container', function() {
         this.timeout(10000);
+
         it('should download a resource container successfully', function() {
             return client.downloadResourceContainer('en', 'gen', 'ulb');
+        });
+
+        it('should download, close, and reopen a resource container successfully', function() {
+            return client.downloadResourceContainer('en', 'gen', 'udb')
+                .then(function(container) {
+                    assert.notEqual(null, container);
+                    return client.closeResourceContainer('en', 'gen', 'udb');
+                })
+                .then(function(path) {
+                    assert.notEqual(null, path);
+                    assert.ok(fileUtils.fileExists(path));
+                    return client.openResourceContainer('en', 'gen', 'udb');
+                })
+                .then(function(container) {
+                    assert.notEqual(null, container);
+                });
         });
     });
 });
