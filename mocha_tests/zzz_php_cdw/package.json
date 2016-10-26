@@ -1,0 +1,33 @@
+{
+  "package_version": "0.1",
+  "modified_at": 20161026,
+  "content_mime_type": "text/usx",
+  "language": {
+    "slug": "zzz",
+    "name": "Z-Lang",
+    "direction": "ltr"
+  },
+  "project": {
+    "slug": "php",
+    "name": "Philippians",
+    "desc": "",
+    "icon": "",
+    "sort": 51,
+    "chunks_url": "https://api.unfoldingword.org/bible/txt/1/php/chunks.json"
+  },
+  "resource": {
+    "slug": "cdw",
+    "name": "Whitfield Limited",
+    "type": "book",
+    "status": {
+      "translate_mode": "all",
+      "checking_level": "3",
+      "comments": "",
+      "pub_date": 20161026,
+      "license": "",
+      "version": "7"
+    },
+    "imported": false
+  },
+  "chunk_status": []
+}
