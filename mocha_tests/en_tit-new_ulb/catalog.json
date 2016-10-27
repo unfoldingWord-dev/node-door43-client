@@ -1,0 +1,18 @@
+[
+  {
+    "date_modified": "20160728",
+    "lang_catalog": "http://localhost:8090/ts/txt/2/obs/languages.json",
+    "meta": [ ],
+    "slug": "obs",
+    "sort": "01"
+  },
+  {
+    "date_modified": "20160901",
+    "lang_catalog": "http://localhost:8090/ts/txt/2/gen/languages.json",
+    "meta": [
+      "bible-ot"
+    ],
+    "slug": "gen",
+    "sort": "01"
+  }
+]
