@@ -3,16 +3,19 @@
 var rimraf = require('rimraf');
 var mkdirp = require('mkdirp');
 var assert = require('assert');
+var ncp = require('ncp').ncp;
 var fileUtils = require('../lib/utils/files');
 describe('Download', function() {
     let client;
 
-    beforeEach(function() {
+    beforeEach(function(done) {
         rimraf.sync('mocha_tests/out');
         let Door43Client = require('../');
         // TRICKY: copy test index so we don't persist test data
-        ncp('mocha_tests/index.sqlite', 'mocha_tests/out/index.sqlite');
-        client = new Door43Client('mocha_tests/out/index.sqlite', 'mocha_tests/out/containers');
+        ncp('mocha_tests/index.sqlite', 'mocha_tests/out/download_index.sqlite', function(err) {
+            client = new Door43Client('mocha_tests/out/download_index.sqlite', 'mocha_tests/out/containers');
+            done();
+        });
     });
 
     describe('download container', function() {
