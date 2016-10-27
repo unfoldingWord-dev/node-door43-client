@@ -515,13 +515,10 @@ describe('Library', () => {
             }];
             var project4 = _.cloneDeep(project);
             project4.slug = 'proj-4';
+            // TODO: this is breaking things
             project4.categories = [{
                     name: 'Second Cat',
                     slug: 'second-cat'
-                },
-                {
-                    name: 'Third Cat',
-                    slug: 'third-cat'
                 }];
 
             // library.addProject(project1, source_language_fr.id);
@@ -629,13 +626,27 @@ describe('Library', () => {
             });
         });
 
-        // piggy back on this state to test categories
-        let cat = library.public_getters.getCategory('en', 'third-cat');
-        expect(cat).not.toEqual(null);
-        let categories = library.public_getters.getCategories('en', project4.slug);
-        expect(categories.length).toEqual(2);
-        expect(categories[0].slug).toEqual('second-cat');
-        expect(categories[1].slug).toEqual('third-cat');
+        it('should return categories for a project', () => {
+            var project1 = _.cloneDeep(project);
+            project1.slug = 'proj-cat-test';
+            project1.categories = [{
+                    name: 'Second Cat',
+                    slug: 'second-cat'
+                },
+                {
+                    name: 'Third Cat',
+                    slug: 'third-cat'
+                }
+            ];
+            library.addProject(project1, source_language_en.id);
+
+            let cat = library.public_getters.getCategory('en', 'third-cat');
+            expect(cat).not.toEqual(null);
+            let categories = library.public_getters.getCategories('en', project1.slug);
+            expect(categories.length).toEqual(2);
+            expect(categories[0].slug).toEqual('second-cat');
+            expect(categories[1].slug).toEqual('third-cat');
+        });
     });
 
     describe('Resources', () => {
