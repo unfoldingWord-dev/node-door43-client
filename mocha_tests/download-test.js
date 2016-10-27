@@ -10,7 +10,9 @@ describe('Download', function() {
     beforeEach(function() {
         rimraf.sync('mocha_tests/out');
         let Door43Client = require('../');
-        client = new Door43Client('mocha_tests/index.sqlite', 'mocha_tests/out/containers');
+        // TRICKY: copy test index so we don't persist test data
+        ncp('mocha_tests/index.sqlite', 'mocha_tests/out/index.sqlite');
+        client = new Door43Client('mocha_tests/out/index.sqlite', 'mocha_tests/out/containers');
     });
 
     describe('download container', function() {
