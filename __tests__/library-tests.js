@@ -516,9 +516,13 @@ describe('Library', () => {
             var project4 = _.cloneDeep(project);
             project4.slug = 'proj-4';
             project4.categories = [{
-                name: 'Second Cat',
-                slug: 'second-cat'
-            }];
+                    name: 'Second Cat',
+                    slug: 'second-cat'
+                },
+                {
+                    name: 'Third Cat',
+                    slug: 'third-cat'
+                }];
 
             // library.addProject(project1, source_language_fr.id);
             library.addProject(project1, source_language_de.id);
@@ -624,6 +628,14 @@ describe('Library', () => {
                 en: 3
             });
         });
+
+        // piggy back on this state to test categories
+        let cat = library.public_getters.getCategory('en', 'third-cat');
+        expect(cat).not.toEqual(null);
+        let categories = library.public_getters.getCategories('en', project4.slug);
+        expect(categories.length).toEqual(2);
+        expect(categories[0].slug).toEqual('second-cat');
+        expect(categories[1].slug).toEqual('third-cat');
     });
 
     describe('Resources', () => {

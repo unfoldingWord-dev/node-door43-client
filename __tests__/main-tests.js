@@ -372,6 +372,9 @@ describe('Client', () => {
             source_language_slug: 'en',
             source_language_id: 1
         };
+        library.__queueResponse = [
+            {name: 'New Testament', slug: 'bible-nt'}
+        ];
         library.__queueResponse = {
             id: 1,
             slug: 'obs',
@@ -499,9 +502,16 @@ describe('Import', () => {
             language: { slug: 'en'},
             project: { slug: 'gen'},
             resource: { slug: 'ulb', status: { checking_level: '2'}},
-            get info() { return {}; }
+            get info() {
+                return {
+                    project : {
+                        categories: ['bible-ot']
+                    }
+                };
+            }
         };
 
+        library.__queueResponse = { name: 'Old Testament', slug: 'bible-ot'};
         library.__queueResponse = {
             id: 1,
             slug: 'ulb',
