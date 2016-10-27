@@ -747,7 +747,7 @@ describe('Library', () => {
             testIncomplete('addResource', resource, [source_language.id, project.id]);
         });
 
-        it('it should return null for a missing resource', () => {
+        it('should return null for a missing resource', () => {
             testMissing('getResource', [source_language.slug, project.slug, 'missing-res']);
             testMissing('getResource', [source_language.slug, 'missing-proj', 'missing-res']);
             testMissing('getResource', ['missing-lang', 'missing-proj', 'missing-res']);

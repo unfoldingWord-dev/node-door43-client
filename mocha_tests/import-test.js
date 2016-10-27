@@ -34,31 +34,44 @@ describe('Import', function() {
                 });
         });
 
-        it('should import a new resource container', function() {
+        it('should fail to import a resource container with a new project', function() {
             let Door43Client = require('../');
             let emptyClient = new Door43Client('mocha_tests/out/empty.sqlite', 'mocha_tests/out/containers');
             return emptyClient.importResourceContainer('mocha_tests/en_tit-new_ulb')
                 .then(function(container) {
-                    assert.equal(container.path, 'mocha_tests/out/containers/en_tit-new_ulb');
-                    // attempt to open normally
-                    return emptyClient.openResourceContainer('en', 'tit-new', 'ulb');
+                    assert.ok(false);
                 })
-                .then(function(container) {
-                    assert.equal(container.path, 'mocha_tests/out/containers/en_tit-new_ulb');
-
-                    // make sure the indexed project is accessible
-                    let project = emptyClient.indexSync.getProject('en', 'tit-new');
-                    assert.ok(project != null);
-
-                    let entries = emptyClient.indexSync.getProjectCategories(0, "en", null);
-                    assert.equal(entries.length, 1);
-                    assert.equal(entries[0].slug, 'bible-nt');
-                    assert.equal(entries[0].type, 'category');
-                    let subEntries = emptyClient.indexSync.getProjectCategories(entries[0].id, "en", null);
-                    assert.equal(subEntries.length, 1);
-                    assert.equal(subEntries[0].slug, 'tit-new');
-                    assert.equal(subEntries[0].type, 'project');
+                .catch(function(err) {
+                    assert.equal(err.message, 'Unsupported project');
                 });
         });
+
+        // we currently do not support importing new projects. If we ever do this test checks that
+        // it('should import a resource container with a new project', function() {
+        //     let Door43Client = require('../');
+        //     let emptyClient = new Door43Client('mocha_tests/out/empty.sqlite', 'mocha_tests/out/containers');
+        //     return emptyClient.importResourceContainer('mocha_tests/en_tit-new_ulb')
+        //         .then(function(container) {
+        //             assert.equal(container.path, 'mocha_tests/out/containers/en_tit-new_ulb');
+        //             // attempt to open normally
+        //             return emptyClient.openResourceContainer('en', 'tit-new', 'ulb');
+        //         })
+        //         .then(function(container) {
+        //             assert.equal(container.path, 'mocha_tests/out/containers/en_tit-new_ulb');
+        //
+        //             // make sure the indexed project is accessible
+        //             let project = emptyClient.indexSync.getProject('en', 'tit-new');
+        //             assert.ok(project != null);
+        //
+        //             let entries = emptyClient.indexSync.getProjectCategories(0, "en", null);
+        //             assert.equal(entries.length, 1);
+        //             assert.equal(entries[0].slug, 'bible-nt');
+        //             assert.equal(entries[0].type, 'category');
+        //             let subEntries = emptyClient.indexSync.getProjectCategories(entries[0].id, "en", null);
+        //             assert.equal(subEntries.length, 1);
+        //             assert.equal(subEntries[0].slug, 'tit-new');
+        //             assert.equal(subEntries[0].type, 'project');
+        //         });
+        // });
     });
 });

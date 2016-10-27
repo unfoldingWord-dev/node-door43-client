@@ -511,6 +511,7 @@ describe('Import', () => {
             }
         };
 
+        library.__queueResponse = { };
         library.__queueResponse = { name: 'Old Testament', slug: 'bible-ot'};
         library.__queueResponse = {
             id: 1,
