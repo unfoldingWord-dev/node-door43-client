@@ -944,6 +944,10 @@ describe('Library', () => {
                 language_slug: 'en',
                 language_name: 'English',
                 language_direction: 'ltr',
+                language_data: {
+                    ln: 0,
+                    cc: 4
+                },
                 td_id: 1
             };
             questionnaireAlt = alter(questionnaire, ['language_name']);
@@ -1003,6 +1007,10 @@ describe('Library', () => {
                 language_slug: 'en',
                 language_name: 'English',
                 language_direction: 'ltr',
+                language_data: {
+                    ln: 0,
+                    cc: 4
+                },
                 td_id: 1
             };
             questionnaireId = library.addQuestionnaire(questionnaire);

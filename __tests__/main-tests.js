@@ -36,7 +36,70 @@ describe('Client', () => {
     });
 
     it('should index the questionnaires', () => {
-        // TODO: write tests for indexing
+        library.__queueResponse = {slug: 'new-language-questions', url: 'some url', modified: 0};
+        request.__setStatusCode = 200;
+        request.__queueResponse = JSON.stringify({
+            languages: [{
+                questions: [{
+                    text: "What do you call your language?",
+                    depends_on: null,
+                    sort: 1,
+                    help: "",
+                    required: true,
+                    input_type: "string",
+                    id: 0
+                },
+                {
+                    text: "Does that have a special meaning?",
+                    depends_on: 0,
+                    sort: 2,
+                    help: "",
+                    required: false,
+                    input_type: "string",
+                    id: 1
+                },
+                {
+                    text: "Do you have other names for your language?",
+                    depends_on: 0,
+                    sort: 3,
+                    help: "",
+                    required: false,
+                    input_type: "string",
+                    id: 2
+                },
+                {
+                    text: "Is your language written from left to right?",
+                    depends_on: null,
+                    sort: 4,
+                    help: "",
+                    required: true,
+                    input_type: "boolean",
+                    id: 3
+                },
+                {
+                    text: "What country are you in?",
+                    depends_on: null,
+                    sort: 5,
+                    help: "",
+                    required: true,
+                    input_type: "string",
+                    id: 4
+                }],
+                slug: 'en',
+                questionnaire_id: 1,
+                language_data: {
+                    ln: 0,
+                    cc: 4
+                },
+                dir: 'ltr',
+                name: 'English'
+            }]
+        });
+
+        return client.legacy_tools.updateCatalog('new-language-questions')
+            .then(function() {
+                // TODO: assert things worked
+            });
     });
 
     it('should index the target languages', () => {
