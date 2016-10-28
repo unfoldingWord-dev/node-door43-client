@@ -1000,6 +1000,7 @@ describe('Library', () => {
         var question;
         var questionAlt;
         var questionnaireId;
+        var independentQuestion;
 
         beforeEach(() => {
             setUpContext();
@@ -1024,8 +1025,25 @@ describe('Library', () => {
                 depends_on: 0,
                 td_id: 5
             };
+            independentQuestion = {
+                text: 'This is a question',
+                help: 'Give me an answer',
+                is_required: 1,
+                input_type: 'string',
+                sort: 1,
+                depends_on: null,
+                td_id: 5
+            };
             questionAlt = alter(question, ['text']);
             questionAlt.td_id = 6;
+        });
+
+        it('should add an independent question to the database', () => {
+            var id = library.addQuestion(independentQuestion, questionnaireId);
+            expect(id).toBeTruthy();
+            var questions = library.public_getters.getQuestions(questionnaireId);
+            expect(questions.length).toEqual(1);
+            expect(questions[0].depends_on).toEqual(-1);
         });
 
         it('should add a question to the database', () => {
