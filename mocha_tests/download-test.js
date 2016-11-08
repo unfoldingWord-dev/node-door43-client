@@ -24,7 +24,14 @@ describe('Download', function() {
         this.timeout(10000);
 
         it('should download a resource container successfully', function() {
-            return client.downloadResourceContainer('en', 'gen', 'ulb');
+            var progressCalled = false;
+            return client.downloadResourceContainer('en', 'gen', 'ulb', function(size, progress) {
+                    progressCalled = true;
+                })
+                .then(function(container) {
+                    assert.ok(progressCalled);
+                    assert.notEqual(null, container);
+                });
         });
 
         it('should download, close, and reopen a resource container successfully', function() {
