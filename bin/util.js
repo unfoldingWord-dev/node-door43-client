@@ -29,7 +29,7 @@ function writeProgress(id, total, completed) {
         'approved-temp-langnames': 'Indexing Approved Temporary Target Languages',
         'new-language-questions': 'Indexing Questionnaire'
     };
-    process.stdout.write((progressTitles[id] || id) + ' ' + percent + '%');
+    process.stdout.write((progressTitles[id] || id) + ' [' + total + '] ' + percent + '%');
 }
 
 module.exports.logProgress = writeProgress;
