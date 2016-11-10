@@ -1089,4 +1089,77 @@ describe('Library', () => {
             expect(result.length).toEqual(2);
         });
     });
+
+    describe('Translations', () => {
+
+        beforeEach(() => {
+            setUpContext();
+
+            // prep content
+            var language = {
+                slug: 'en',
+                name: 'English',
+                direction: 'ltr'
+            };
+            var language_id = library.addSourceLanguage(language);
+            var project = {
+                slug: 'gen',
+                name: 'Genesis',
+                desc: 'The book of Genesis',
+                icon: '',
+                sort: 1,
+                chunks_url: 'https://api.unfoldingword.org/bible/txt/1/gen/chunks.json',
+                categories: [{
+                    name: 'Old Testament',
+                    slug: 'bible-ot'
+                }],
+                source_language_slug: language.slug,
+                source_language_id: language_id
+            };
+            var project_id = library.addProject(project, language_id);
+            var resource = {
+                slug: 'ulb',
+                name: 'Unlocked Literal Bible',
+                type: 'book',
+                status: {
+                    translate_mode: 'all',
+                    checking_level: '3',
+                    version: '3'
+                },
+                formats: [{
+                    package_version: 1,
+                    mime_type: 'application/ts+book',
+                    modified_at: 20151222120130,
+                    url: 'https://api.unfoldingword.org/ts/txt/2/gen/en/ulb/source.json'
+                }]
+            };
+            library.addResource(resource, project_id);
+            var resource2 = {
+                slug: 'udb',
+                name: 'Unlocked Dynamic Bible',
+                type: 'book',
+                status: {
+                    translate_mode: 'all',
+                    checking_level: '1',
+                    version: '1'
+                },
+                formats: [{
+                    package_version: 1,
+                    mime_type: 'application/ts+book',
+                    modified_at: 20151222120130,
+                    url: 'https://api.unfoldingword.org/ts/txt/2/gen/en/udb/source.json'
+                }]
+            };
+            library.addResource(resource2, project_id);
+        });
+
+        it('should return a list of translations', () => {
+            var translations = library.public_getters.findTranslations('en', 'gen', null, null, null, 0, -1);
+            expect(translations.length).toEqual(2);
+
+            translations = library.public_getters.findTranslations('en', 'gen', null, null, null, 3, -1);
+            expect(translations.length).toEqual(1);
+        });
+
+    });
 });
