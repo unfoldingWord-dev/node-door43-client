@@ -102,16 +102,49 @@ describe('Client', () => {
             });
     });
 
-    it('should index the target languages', () => {
-        // TODO: write tests for indexing
-    });
+    it('should index target languages', () => {
+        // langs
+        library.__queueResponse = {
+            slug: 'langnames',
+            url: 'some/url'
+        };
+        request.__queueStatusCode = 200;
+        request.__queueResponse = JSON.stringify([
+            {"pk": 1, "cc": ["US"], "ln": "English", "ld": "ltr", "lc": "en", "alt": [], "gw": true, "ang": "English", "lr": "North America"}
+        ]);
 
-    it('should index the temporary target languages', () => {
-        // TODO: write tests for indexing
-    });
+        // temp langs
+        library.__queueResponse = {
+            slug: 'temp-langnames',
+            url: 'some/url'
+        };
+        request.__queueStatusCode = 200;
+        request.__queueResponse = JSON.stringify([
+            {"pk": 1, "cc": ["US"], "ln": "Temp English", "ld": "ltr", "lc": "qaa-x-temp-en", "alt": [], "gw": true, "ang": "Temp English", "lr": "North America"}
+        ]);
 
-    it('should index the approved temporary target languages', () => {
-        // TODO: write tests for indexing
+        // approved langs
+        library.__queueResponse = {
+            slug: 'approved-temp-langnames',
+            url: 'some/url'
+        };
+        request.__queueStatusCode = 200;
+        request.__queueResponse = JSON.stringify([
+            {"qaa-x-temp-en": "en"}
+        ]);
+
+        return client.legacy_tools.updateCatalog('langnames')
+            .then(function(response) {
+                return client.legacy_tools.updateCatalog('temp-langnames');
+            })
+            .then(function(response) {
+                return client.legacy_tools.updateCatalog('approved-temp-langnames');
+            })
+            .then(function(response) {
+                expect(library.addTargetLanguage.mock.calls.length).toEqual(1);
+                expect(library.addTempTargetLanguage.mock.calls.length).toEqual(1);
+                expect(library.setApprovedTargetLanguage.mock.calls.length).toEqual(1);
+            });
     });
 
     it('should index the Door43 catalog', () => {
