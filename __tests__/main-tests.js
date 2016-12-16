@@ -944,46 +944,14 @@ describe('Update check', () => {
     });
 
     it('should abort catalog downloads when exception is thrown', function() {
-        library.__queueResponse = [{
-                slug: 'langnames',
-                chunks_url: 'some/url'
-            },
-            {
-                slug: 'new-language-questions',
-                chunks_url: 'some/url'
-            }];
         library.__queueResponse = {
             slug: 'langnames',
-            chunks_url: 'some/url'
-        };
-        library.__queueResponse = {
-            slug: 'new-language-questions',
-            chunks_url: 'some/url'
+            url: 'some/url'
         };
         request.__queueStatusCode = 200;
         request.__queueResponse = function() {
             throw new Error('Something bad happened');
         };
-        request.__queueStatusCode = 200;
-        request.__queueResponse = JSON.stringify([
-            {
-                chp: "01",
-                firstvs: "01"
-            },
-            {
-                chp: "01",
-                firstvs: "03"
-            },
-            {
-                chp: "01",
-                firstvs: "06"
-            },
-            {
-                chp: "01",
-                firstvs: "09"
-            }
-        ]);
-        request.__setStatusCode = 400;
 
         return client.updateCatalogs()
             .then(() => {
@@ -992,6 +960,7 @@ describe('Update check', () => {
             .catch((err) => {
                 expect(err instanceof Error);
                 expect(library.addTargetLanguage.mock.calls.length).toEqual(0);
+                expect(library.setApprovedTargetLanguage.mock.calls.length).toEqual(0);
                 expect(library.addQuestionnaire.mock.calls.length).toEqual(0);
                 expect(library.addQuestion.mock.calls.length).toEqual(0);
                 expect(request.read.mock.calls.length).toEqual(1);
@@ -999,24 +968,35 @@ describe('Update check', () => {
     });
 
     it('should not abort catalog downloads when 404 is received', function() {
-        library.__queueResponse = [{
-            slug: 'langnames',
-            chunks_url: 'some/url'
-        },
-            {
-                slug: 'new-language-questions',
-                chunks_url: 'some/url'
-            }];
+        // langs
         library.__queueResponse = {
             slug: 'langnames',
-            chunks_url: 'some/url'
-        };
-        library.__queueResponse = {
-            slug: 'new-language-questions',
-            chunks_url: 'some/url'
+            url: 'some/url'
         };
         request.__queueStatusCode = 404;
         request.__queueResponse = JSON.stringify([]);
+
+        // temp langs
+        library.__queueResponse = {
+            slug: 'temp-langnames',
+            url: 'some/url'
+        };
+        request.__queueStatusCode = 404;
+        request.__queueResponse = JSON.stringify([]);
+
+        // approved langs
+        library.__queueResponse = {
+            slug: 'approved-temp-langnames',
+            url: 'some/url'
+        };
+        request.__queueStatusCode = 404;
+        request.__queueResponse = JSON.stringify([]);
+
+        // lang questions
+        library.__queueResponse = {
+            slug: 'new-language-questions',
+            url: 'some/url'
+        };
         request.__queueStatusCode = 200;
         request.__queueResponse = JSON.stringify(
             {
@@ -1057,11 +1037,10 @@ describe('Update check', () => {
         return client.updateCatalogs()
             .then(() => {
                 expect(library.addTargetLanguage.mock.calls.length).toEqual(0);
+                expect(library.addTempTargetLanguage.mock.calls.length).toEqual(0);
+                expect(library.setApprovedTargetLanguage.mock.calls.length).toEqual(0);
                 expect(library.addQuestionnaire.mock.calls.length).toEqual(1);
                 expect(library.addQuestion.mock.calls.length).toEqual(2);
-            })
-            .catch((err) => {
-                expect(false).toBeTruthy();
             });
     });
 
