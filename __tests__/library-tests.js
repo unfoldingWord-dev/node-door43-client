@@ -363,13 +363,13 @@ describe('Library', () => {
         it('should add a project to the database', () => {
             testInsert('addProject', 'getProject', project,
                 [source_language_en.id], [source_language_en.slug],
-                ['id', 'category_id', 'categories']);
+                ['id', 'category_id', 'category_slug', 'categories']);
         });
 
         it('should update a project in the database', () => {
             testUpdate('addProject', 'getProject', project, projectAlt,
                 [source_language_en.id], [source_language_en.slug],
-                ['id', 'category_id', 'categories']);
+                ['id', 'category_id', 'category_slug', 'categories']);
         });
 
         it('should not add incomplete project to the database', () => {
@@ -455,7 +455,10 @@ describe('Library', () => {
             expect(allModeResult.length).toEqual(3); // 2 projects and 1 category
             var numAllProj = 0;
             allModeResult.forEach(function(item) {
-                if(item.type == 'project') numAllProj ++;
+                if(item.type == 'project') {
+                    numAllProj ++;
+                    expect(item.category_slug).not.toBeNull();
+                }
             });
             expect(numAllProj).toEqual(2);
 
