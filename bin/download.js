@@ -68,10 +68,10 @@ exports.handler = function(argv) {
     console.log('Downloading resource containers:', argv.dir);
 
     // begin download
-    var compression = 'tar';
+    let compression = 'tar';
     // if(argv.zip) compression = 'zip';
-    var client = new Door43Client(argv.index, argv.dir, {compression_method:compression});
-    var getLanguages = function(lang) {
+    let client = new Door43Client(argv.index, argv.dir, {compression_method:compression});
+    let getLanguages = function(lang) {
         if(lang) {
             return client.index.getSourceLanguage(lang)
                 .then(function(language) {
@@ -82,11 +82,15 @@ exports.handler = function(argv) {
         }
     };
 
-    var download = function(opts) {
+    let download = function(opts) {
         return client.downloadResourceContainer(opts)
             .then(function(c) {
                 if(argv.close) {
-                    client.closeResourceContainer(c.info.language.slug, c.info.project.slug, c.info.resource.slug);
+                    return client.closeResourceContainer(c.info.language.slug, c.info.project.slug, c.info.resource.slug)
+                        .then(function() {
+                            // make response empty
+                            return Promise.resolve();
+                        });
                 }
                 return Promise.resolve();
             });
@@ -94,8 +98,8 @@ exports.handler = function(argv) {
 
     getLanguages(argv.lang)
         .then(function(languages) {
-            var list = [];
-            for(var language of languages) {
+            let list = [];
+            for(let language of languages) {
                 if(argv.proj) {
                     list.push({
                         languageSlug: language.slug,
@@ -105,7 +109,7 @@ exports.handler = function(argv) {
                     list.push(language.slug);
                 }
             }
-            var errHandler = function(err, data){
+            let errHandler = function(err, data){
                 if(argv.verbose) console.log(err);
                 return false;
             };
@@ -117,10 +121,10 @@ exports.handler = function(argv) {
             }
         })
         .then(function(projectGroups) {
-            var list = [];
-            for(var group of projectGroups) {
+            let list = [];
+            for(let group of projectGroups) {
                 if(group.constructor !== Array) group = [group];
-                for(var project of group) {
+                for(let project of group) {
                     list.push({
                         projectSlug: project.slug,
                         languageSlug: project.source_language_slug
@@ -133,9 +137,9 @@ exports.handler = function(argv) {
             })(list);
         })
         .then(function(resourceGroups) {
-            var list = [];
-            for(var group of resourceGroups) {
-                for(var resource of group) {
+            let list = [];
+            for(let group of resourceGroups) {
+                for(let resource of group) {
                     list.push({
                         languageSlug: resource.source_language_slug,
                         projectSlug: resource.project_slug,
@@ -154,7 +158,7 @@ exports.handler = function(argv) {
                     }
                 } else {
                     if(argv.log) {
-                        var errMessage = err.status ? err.status : err.toString();
+                        let errMessage = err.status ? err.status : err.toString();
                         fs.writeFileSync(path.join(argv.dir, 'log.txt'), errMessage + ': while downloading:\n' + JSON.stringify(data) + '\n\n', {flag: 'a'});
                     }
                     if(argv.verbose) {
