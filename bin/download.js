@@ -24,7 +24,8 @@ exports.builder = {
     },
     l: {
         alias: 'lang',
-        description: 'Limit the download to only resources in the given language. e.g. "en"'
+        description: 'Limit the download to only resources in the given language. e.g. "en"',
+        array: true
     },
     p: {
         alias: 'proj',
@@ -72,11 +73,8 @@ exports.handler = function(argv) {
     // if(argv.zip) compression = 'zip';
     let client = new Door43Client(argv.index, argv.dir, {compression_method:compression});
     let getLanguages = function(lang) {
-        if(lang) {
-            return client.index.getSourceLanguage(lang)
-                .then(function(language) {
-                    return [language];
-                });
+        if(lang && lang.length > 0) {
+            return client.index.getSpecificSourceLanguages(lang);
         } else {
             return client.index.getSourceLanguages();
         }
