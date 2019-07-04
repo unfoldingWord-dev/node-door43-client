@@ -36,6 +36,10 @@ exports.builder = {
         description: 'Overwrites the directory if it already exists',
         default: false
     },
+    lazy: {
+       description: 'Skips resources that have already been downloaded',
+        default: false
+    },
     log: {
         description: 'Log errors to log.txt',
         default: false
@@ -138,6 +142,19 @@ exports.handler = function(argv) {
             let list = [];
             for(let group of resourceGroups) {
                 for(let resource of group) {
+                    // skip downloaded files if lazy
+                    if(argv.lazy) {
+                        let fileName = `${resource.source_language_slug}_${resource.project_slug}_${resource.slug}`;
+                        if(argv.close) {
+                            fileName += '.tsrc';
+                        }
+                        let filePath = path.join(argv.dir, fileName);
+                        if(fs.existsSync(filePath)) {
+                            console.log('Skipping', fileName);
+                            continue;
+                        }
+                    }
+
                     list.push({
                         languageSlug: resource.source_language_slug,
                         projectSlug: resource.project_slug,
